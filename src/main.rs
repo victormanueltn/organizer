@@ -3,15 +3,25 @@ use iced::Sandbox;
 #[derive(Default)]
 struct Counter {
     value: i32,
-
     increment_button: iced::button::State,
     decrement_button: iced::button::State,
+    task_completed: bool,
+    //    task_state: Task,
 }
+
+struct Task {
+    description: String,
+    completed: bool,
+    state: TaskState,
+}
+
+pub enum TaskState {}
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
     IncrementPressed,
     DecrementPressed,
+    TaskCompleted(bool),
 }
 
 impl iced::Sandbox for Counter {
@@ -38,6 +48,11 @@ impl iced::Sandbox for Counter {
                 iced::Button::new(&mut self.decrement_button, iced::Text::new("-"))
                     .on_press(Message::DecrementPressed),
             )
+            .push(iced::Checkbox::new(
+                self.task_completed,
+                String::from(""),
+                Message::TaskCompleted,
+            ))
             .into()
     }
 
@@ -45,6 +60,7 @@ impl iced::Sandbox for Counter {
         match message {
             Message::IncrementPressed => self.value += 1,
             Message::DecrementPressed => self.value -= 1,
+            Message::TaskCompleted(completed) => self.task_completed = completed,
         }
     }
 }
