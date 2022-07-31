@@ -1,6 +1,6 @@
 #[derive(Default)]
 pub struct Task {
-    pub task_completed: bool,
+    task_completed: bool,
 }
 
 #[derive(Debug, Clone, Copy)]
