@@ -1,8 +1,6 @@
 use iced::Sandbox;
-
-mod task;
-use task::Task;
+use organizer::Organizer;
 
 fn main() -> iced::Result {
-    Task::run(iced::Settings::default())
+    Organizer::run(iced::Settings::default())
 }
