@@ -20,7 +20,7 @@ impl Sandbox for Organizer {
     }
 
     fn title(&self) -> String {
-        String::from("Task")
+        String::from("Organizer")
     }
 
     fn view(&mut self) -> iced::Element<Message> {
