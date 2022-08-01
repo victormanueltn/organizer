@@ -1,4 +1,4 @@
-use iced::Sandbox;
+use iced::pure::{checkbox, column, Element, Sandbox};
 mod task;
 use crate::task::Task;
 
@@ -20,18 +20,16 @@ impl Sandbox for Organizer {
     }
 
     fn title(&self) -> String {
-        String::from("Organizer")
+        String::from("Task")
     }
 
-    fn view(&mut self) -> iced::Element<Message> {
-        iced::Column::new()
+    fn view(&self) -> Element<Message> {
+        let checkbox = checkbox("test", self.task.completed(), Message::TaskCompleted);
+
+        column()
             .padding(10)
             .align_items(iced::Alignment::Center)
-            .push(iced::Checkbox::new(
-                self.task.completed(),
-                String::from(""),
-                Message::TaskCompleted,
-            ))
+            .push(checkbox)
             .into()
     }
 

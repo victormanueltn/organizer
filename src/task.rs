@@ -1,6 +1,7 @@
 #[derive(Default)]
 pub struct Task {
     task_completed: bool,
+    //    description: String,
 }
 
 impl Task {

@@ -1,4 +1,4 @@
-use iced::Sandbox;
+use iced::pure::Application;
 use organizer::Organizer;
 
 fn main() -> iced::Result {
