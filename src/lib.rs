@@ -2,7 +2,6 @@ use iced::pure::{checkbox, column, Element, Sandbox};
 mod task;
 use crate::task::Task;
 
-#[derive(Default)]
 pub struct Organizer {
     task: Task,
 }
@@ -16,7 +15,9 @@ impl Sandbox for Organizer {
     type Message = Message;
 
     fn new() -> Self {
-        Self::default()
+        Organizer {
+            task: Task::new("A task to be completed.".to_string()),
+        }
     }
 
     fn title(&self) -> String {
@@ -24,7 +25,11 @@ impl Sandbox for Organizer {
     }
 
     fn view(&self) -> Element<Message> {
-        let checkbox = checkbox("test", self.task.completed(), Message::TaskCompleted);
+        let checkbox = checkbox(
+            &self.task.description,
+            self.task.completed(),
+            Message::TaskCompleted,
+        );
 
         column()
             .padding(10)
