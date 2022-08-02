@@ -26,7 +26,7 @@ impl Sandbox for Organizer {
 
     fn view(&self) -> Element<Message> {
         let checkbox = checkbox(
-            &self.task.description,
+            &self.task.description().to_string(),
             self.task.completed(),
             Message::TaskCompleted,
         );
