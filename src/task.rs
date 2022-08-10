@@ -1,8 +1,3 @@
-#[derive(Debug, Clone, Copy)]
-pub enum TaskMessage {
-    TaskCompleted(bool),
-    ButtonPressed,
-}
 
 pub struct Task {
     task_completed: bool,
