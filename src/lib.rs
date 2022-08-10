@@ -1,4 +1,7 @@
-use iced::pure::{checkbox, column, Element, Sandbox};
+use iced::alignment;
+use iced::pure::widget::Row;
+use iced::pure::{button, checkbox, row, widget::Text, Element, Sandbox};
+use iced::Length;
 mod task;
 use crate::task::Task;
 
@@ -9,6 +12,7 @@ pub struct Organizer {
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
     TaskCompleted(bool),
+    ButtonPressed,
 }
 
 impl Sandbox for Organizer {
@@ -25,22 +29,39 @@ impl Sandbox for Organizer {
     }
 
     fn view(&self) -> Element<Message> {
-        let checkbox = checkbox(
-            &self.task.description().to_string(),
-            self.task.completed(),
-            Message::TaskCompleted,
-        );
+        let a_row = row();
 
-        column()
-            .padding(10)
-            .align_items(iced::Alignment::Center)
-            .push(checkbox)
-            .into()
+        let return_row = add_task_view(&self.task, a_row);
+
+        return_row.into()
     }
 
     fn update(&mut self, message: Message) {
         match message {
             Message::TaskCompleted(completed) => self.task.set_completed(completed),
+            Message::ButtonPressed => self.task.set_completed(true),
         }
     }
+}
+
+fn add_task_view<'a>(a_task: &Task, a_row: Row<'a, Message>) -> Row<'a, Message> {
+    let checkbox_instance = checkbox(
+        a_task.description().to_string(),
+        a_task.completed(),
+        Message::TaskCompleted,
+    );
+
+    let edit_text = Text::new("Edit")
+        .width(Length::Units(60))
+        .horizontal_alignment(alignment::Horizontal::Center)
+        .size(20);
+    let edit_button = button(edit_text)
+        .on_press(Message::ButtonPressed)
+        .padding(10);
+
+    a_row
+        .spacing(20)
+        .align_items(iced::Alignment::Center)
+        .push(checkbox_instance)
+        .push(edit_button)
 }

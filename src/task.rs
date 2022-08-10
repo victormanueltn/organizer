@@ -1,6 +1,18 @@
+#[derive(Debug, Clone, Copy)]
+pub enum TaskMessage {
+    TaskCompleted(bool),
+    ButtonPressed,
+}
+
 pub struct Task {
     task_completed: bool,
     description: String,
+    state: TaskState,
+}
+
+enum TaskState {
+    Idle,
+    BeingEdited,
 }
 
 impl Task {
@@ -8,6 +20,7 @@ impl Task {
         Task {
             task_completed: false,
             description,
+            state: TaskState::Idle,
         }
     }
 
