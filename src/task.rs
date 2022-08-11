@@ -1,11 +1,11 @@
-
 pub struct Task {
     task_completed: bool,
     description: String,
     state: TaskState,
 }
 
-enum TaskState {
+#[derive(Clone, Copy)]
+pub(crate) enum TaskState {
     Idle,
     BeingEdited,
 }
@@ -29,6 +29,14 @@ impl Task {
 
     pub fn edit(&mut self, description: String) {
         self.description = description;
+    }
+
+    pub(crate) fn set_state(&mut self, state: TaskState) {
+        self.state = state;
+    }
+
+    pub(crate) fn state(&self) -> TaskState {
+        self.state
     }
 
     pub fn description(&self) -> &str {

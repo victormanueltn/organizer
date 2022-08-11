@@ -3,7 +3,7 @@ use iced::pure::widget::Row;
 use iced::pure::{button, checkbox, row, widget::Text, Element, Sandbox};
 use iced::Length;
 mod task;
-use crate::task::Task;
+use crate::task::{Task, TaskState};
 
 pub struct Organizer {
     task: Task,
@@ -11,8 +11,8 @@ pub struct Organizer {
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
-    TaskCompleted(bool),
-    ButtonPressed,
+    ToggleTaskCompletion(bool),
+    EditingTask,
 }
 
 impl Sandbox for Organizer {
@@ -38,30 +38,51 @@ impl Sandbox for Organizer {
 
     fn update(&mut self, message: Message) {
         match message {
-            Message::TaskCompleted(completed) => self.task.set_completed(completed),
-            Message::ButtonPressed => self.task.set_completed(true),
+            Message::ToggleTaskCompletion(completed) => self.task.set_completed(completed),
+            Message::EditingTask => self.task.set_state(TaskState::BeingEdited),
         }
     }
 }
 
 fn add_task_view<'a>(a_task: &Task, a_row: Row<'a, Message>) -> Row<'a, Message> {
-    let checkbox_instance = checkbox(
-        a_task.description().to_string(),
-        a_task.completed(),
-        Message::TaskCompleted,
-    );
+    match a_task.state() {
+        TaskState::Idle => {
+            let checkbox_instance = checkbox(
+                a_task.description().to_string(),
+                a_task.completed(),
+                Message::ToggleTaskCompletion,
+            );
 
-    let edit_text = Text::new("Edit")
-        .width(Length::Units(60))
-        .horizontal_alignment(alignment::Horizontal::Center)
-        .size(20);
-    let edit_button = button(edit_text)
-        .on_press(Message::ButtonPressed)
-        .padding(10);
+            let edit_text = Text::new("Edit")
+                .width(Length::Units(60))
+                .horizontal_alignment(alignment::Horizontal::Center)
+                .size(20);
+            let edit_button = button(edit_text).on_press(Message::EditingTask).padding(10);
 
-    a_row
-        .spacing(20)
-        .align_items(iced::Alignment::Center)
-        .push(checkbox_instance)
-        .push(edit_button)
+            a_row
+                .spacing(20)
+                .align_items(iced::Alignment::Center)
+                .push(checkbox_instance)
+                .push(edit_button)
+        }
+        TaskState::BeingEdited => {
+            let checkbox_instance = checkbox(
+                a_task.description().to_string(),
+                a_task.completed(),
+                Message::ToggleTaskCompletion,
+            );
+
+            let edit_text = Text::new("Pressed Edit")
+                .width(Length::Units(60))
+                .horizontal_alignment(alignment::Horizontal::Center)
+                .size(20);
+            let edit_button = button(edit_text).on_press(Message::EditingTask).padding(10);
+
+            a_row
+                .spacing(20)
+                .align_items(iced::Alignment::Center)
+                .push(checkbox_instance)
+                .push(edit_button)
+        }
+    }
 }
