@@ -1,6 +1,6 @@
 use iced::alignment;
 use iced::pure::widget::Row;
-use iced::pure::{button, checkbox, row, widget::Text, Element, Sandbox};
+use iced::pure::{button, checkbox, row, text_input, widget::Text, Element, Sandbox};
 use iced::Length;
 mod task;
 use crate::task::{Task, TaskState};
@@ -9,10 +9,12 @@ pub struct Organizer {
     task: Task,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum Message {
     ToggleTaskCompletion(bool),
     EditingTask,
+    TextInput(String),
+    DescriptionEdited,
 }
 
 impl Sandbox for Organizer {
@@ -40,6 +42,8 @@ impl Sandbox for Organizer {
         match message {
             Message::ToggleTaskCompletion(completed) => self.task.set_completed(completed),
             Message::EditingTask => self.task.set_state(TaskState::BeingEdited),
+            Message::TextInput(text) => self.task.edit(text),
+            Message::DescriptionEdited => self.task.set_state(TaskState::Idle),
         }
     }
 }
@@ -66,23 +70,18 @@ fn add_task_view<'a>(a_task: &Task, a_row: Row<'a, Message>) -> Row<'a, Message>
                 .push(edit_button)
         }
         TaskState::BeingEdited => {
-            let checkbox_instance = checkbox(
-                a_task.description().to_string(),
-                a_task.completed(),
-                Message::ToggleTaskCompletion,
-            );
-
-            let edit_text = Text::new("Pressed Edit")
-                .width(Length::Units(60))
-                .horizontal_alignment(alignment::Horizontal::Center)
-                .size(20);
-            let edit_button = button(edit_text).on_press(Message::EditingTask).padding(10);
+            let a_text_input = text_input(
+                "Describe your task...",
+                &a_task.description(),
+                Message::TextInput,
+            )
+            .on_submit(Message::DescriptionEdited)
+            .padding(10);
 
             a_row
                 .spacing(20)
                 .align_items(iced::Alignment::Center)
-                .push(checkbox_instance)
-                .push(edit_button)
+                .push(a_text_input)
         }
     }
 }
