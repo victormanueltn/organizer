@@ -6,7 +6,7 @@ mod task;
 use crate::task::{Task, TaskState};
 
 pub struct Organizer {
-    task: Task,
+    tasks: Vec<Task>,
 }
 
 #[derive(Debug, Clone)]
@@ -22,7 +22,7 @@ impl Sandbox for Organizer {
 
     fn new() -> Self {
         Organizer {
-            task: Task::new("A task to be completed.".to_string()),
+            tasks: vec![Task::new("A task to be completed.".to_string())],
         }
     }
 
@@ -33,17 +33,17 @@ impl Sandbox for Organizer {
     fn view(&self) -> Element<Message> {
         let a_row = row();
 
-        let return_row = add_task_view(&self.task, a_row);
+        let return_row = add_task_view(&self.tasks[0], a_row);
 
         return_row.into()
     }
 
     fn update(&mut self, message: Message) {
         match message {
-            Message::ToggleTaskCompletion(completed) => self.task.set_completed(completed),
-            Message::EditingTask => self.task.set_state(TaskState::BeingEdited),
-            Message::TextInput(text) => self.task.edit(text),
-            Message::DescriptionEdited => self.task.set_state(TaskState::Idle),
+            Message::ToggleTaskCompletion(completed) => self.tasks[0].set_completed(completed),
+            Message::EditingTask => self.tasks[0].set_state(TaskState::BeingEdited),
+            Message::TextInput(text) => self.tasks[0].edit(text),
+            Message::DescriptionEdited => self.tasks[0].set_state(TaskState::Idle),
         }
     }
 }
