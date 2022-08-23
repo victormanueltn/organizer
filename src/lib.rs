@@ -32,13 +32,15 @@ impl Sandbox for Organizer {
     }
 
     fn view(&self) -> Element<Message> {
-        let a_row = row();
+        let mut a_row = row();
 
-        let return_row = add_task_view(&self.tasks[0], a_row);
+        for task in self.tasks.iter() {
+            a_row = add_task_view(&task, a_row);
+        }
 
-        let return_row = add_task_button(self, return_row);
+        a_row = add_task_button(a_row);
 
-        return_row.into()
+        a_row.into()
     }
 
     fn update(&mut self, message: Message) {
@@ -92,7 +94,7 @@ fn add_task_view<'a>(a_task: &Task, a_row: Row<'a, Message>) -> Row<'a, Message>
     }
 }
 
-fn add_task_button<'a>(organizer: &Organizer, a_row: Row<'a, Message>) -> Row<'a, Message> {
+fn add_task_button<'a>(a_row: Row<'a, Message>) -> Row<'a, Message> {
     let create_task_text = Text::new("Add a task for Victor.")
         .width(Length::Units(60))
         .horizontal_alignment(alignment::Horizontal::Center)
