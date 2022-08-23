@@ -1,6 +1,6 @@
 use iced::alignment;
-use iced::pure::widget::Row;
-use iced::pure::{button, checkbox, row, text_input, widget::Text, Element, Sandbox};
+use iced::pure::widget::Column;
+use iced::pure::{button, checkbox, column, row, text_input, widget::Text, Element, Sandbox};
 use iced::Length;
 mod task;
 use crate::task::{Task, TaskState};
@@ -32,15 +32,15 @@ impl Sandbox for Organizer {
     }
 
     fn view(&self) -> Element<Message> {
-        let mut a_row = row();
+        let mut a_column = column();
 
         for task in self.tasks.iter() {
-            a_row = add_task_view(&task, a_row);
+            a_column = add_task_view(&task, a_column);
         }
 
-        a_row = add_task_button(a_row);
+        a_column = add_task_button(a_column);
 
-        a_row.into()
+        a_column.into()
     }
 
     fn update(&mut self, message: Message) {
@@ -56,7 +56,7 @@ impl Sandbox for Organizer {
     }
 }
 
-fn add_task_view<'a>(a_task: &Task, a_row: Row<'a, Message>) -> Row<'a, Message> {
+fn add_task_view<'a>(a_task: &Task, a_column: Column<'a, Message>) -> Column<'a, Message> {
     match a_task.state() {
         TaskState::Idle => {
             let checkbox_instance = checkbox(
@@ -71,11 +71,16 @@ fn add_task_view<'a>(a_task: &Task, a_row: Row<'a, Message>) -> Row<'a, Message>
                 .size(20);
             let edit_button = button(edit_text).on_press(Message::EditingTask).padding(10);
 
-            a_row
+            let a_row = row()
                 .spacing(20)
                 .align_items(iced::Alignment::Center)
                 .push(checkbox_instance)
-                .push(edit_button)
+                .push(edit_button);
+
+            a_column
+                .spacing(20)
+                .align_items(iced::Alignment::Center)
+                .push(a_row)
         }
         TaskState::BeingEdited => {
             let a_text_input = text_input(
@@ -86,7 +91,7 @@ fn add_task_view<'a>(a_task: &Task, a_row: Row<'a, Message>) -> Row<'a, Message>
             .on_submit(Message::DescriptionEdited)
             .padding(10);
 
-            a_row
+            a_column
                 .spacing(20)
                 .align_items(iced::Alignment::Center)
                 .push(a_text_input)
@@ -94,7 +99,7 @@ fn add_task_view<'a>(a_task: &Task, a_row: Row<'a, Message>) -> Row<'a, Message>
     }
 }
 
-fn add_task_button<'a>(a_row: Row<'a, Message>) -> Row<'a, Message> {
+fn add_task_button<'a>(a_row: Column<'a, Message>) -> Column<'a, Message> {
     let create_task_text = Text::new("Add a task for Victor.")
         .width(Length::Units(60))
         .horizontal_alignment(alignment::Horizontal::Center)
