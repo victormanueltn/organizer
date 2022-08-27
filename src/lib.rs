@@ -11,11 +11,16 @@ pub struct Organizer {
 
 #[derive(Debug, Clone)]
 pub enum Message {
+    AddTask,
+    TaskMessage(usize, TaskMessage),
+}
+
+#[derive(Debug, Clone)]
+pub enum TaskMessage {
     ToggleTaskCompletion(bool),
     EditingTask,
     TextInput(String),
-    DescriptionEdited,
-    AddTask,
+    FinishedEdition,
 }
 
 impl Sandbox for Organizer {
@@ -23,7 +28,7 @@ impl Sandbox for Organizer {
 
     fn new() -> Self {
         Organizer {
-            tasks: vec![Task::new("A task to be completed.".to_string())],
+            tasks: vec![Task::new(0, "A task to be completed.".to_string())],
         }
     }
 
@@ -34,42 +39,57 @@ impl Sandbox for Organizer {
     fn view(&self) -> Element<Message> {
         let mut a_column = column();
 
-        for task in self.tasks.iter() {
-            a_column = add_task_view(&task, a_column);
+        for (index, _) in self.tasks.iter().enumerate() {
+            a_column = a_column.push(
+                add_task_view(&self.tasks, index)
+                    .map(move |message| Message::TaskMessage(index, message)),
+            );
         }
 
         a_column = add_task_button(a_column);
 
-        a_column.into()
+        a_column.spacing(10).into()
     }
 
     fn update(&mut self, message: Message) {
         match message {
-            Message::ToggleTaskCompletion(completed) => self.tasks[0].set_completed(completed),
-            Message::EditingTask => self.tasks[0].set_state(TaskState::BeingEdited),
-            Message::TextInput(text) => self.tasks[0].edit(text),
-            Message::DescriptionEdited => self.tasks[0].set_state(TaskState::Idle),
-            Message::AddTask => self
-                .tasks
-                .push(Task::new("Yet another task for Victor!".to_string())),
+            Message::AddTask => self.tasks.push(Task::new(
+                self.tasks.len(),
+                "Yet another task for Victor!".to_string(),
+            )),
+            Message::TaskMessage(task_id, task_message) => {
+                if let Some(a_task) = self.tasks.get_mut(task_id) {
+                    match task_message {
+                        TaskMessage::ToggleTaskCompletion(completed) => {
+                            a_task.set_completed(completed)
+                        }
+                        TaskMessage::EditingTask => a_task.set_state(TaskState::BeingEdited),
+                        TaskMessage::TextInput(description) => a_task.edit(description),
+                        TaskMessage::FinishedEdition => a_task.set_state(TaskState::Idle),
+                    }
+                }
+            }
         }
     }
 }
 
-fn add_task_view<'a>(a_task: &Task, a_column: Column<'a, Message>) -> Column<'a, Message> {
+fn add_task_view<'a>(tasks: &Vec<Task>, task_id: usize) -> Element<TaskMessage> {
+    let a_task = &tasks[task_id];
     match a_task.state() {
         TaskState::Idle => {
             let checkbox_instance = checkbox(
                 a_task.description().to_string(),
                 a_task.completed(),
-                Message::ToggleTaskCompletion,
+                TaskMessage::ToggleTaskCompletion,
             );
 
             let edit_text = Text::new("Edit")
                 .width(Length::Units(60))
                 .horizontal_alignment(alignment::Horizontal::Center)
                 .size(20);
-            let edit_button = button(edit_text).on_press(Message::EditingTask).padding(10);
+            let edit_button = button(edit_text)
+                .on_press(TaskMessage::EditingTask)
+                .padding(10);
 
             let a_row = row()
                 .spacing(20)
@@ -77,24 +97,23 @@ fn add_task_view<'a>(a_task: &Task, a_column: Column<'a, Message>) -> Column<'a,
                 .push(checkbox_instance)
                 .push(edit_button);
 
-            a_column
-                .spacing(20)
-                .align_items(iced::Alignment::Center)
-                .push(a_row)
+            a_row.into()
         }
         TaskState::BeingEdited => {
             let a_text_input = text_input(
                 "Describe your task...",
                 &a_task.description(),
-                Message::TextInput,
+                TaskMessage::TextInput,
             )
-            .on_submit(Message::DescriptionEdited)
-            .padding(10);
+            .padding(10)
+            .on_submit(TaskMessage::FinishedEdition);
 
-            a_column
+            let a_row = row()
                 .spacing(20)
                 .align_items(iced::Alignment::Center)
-                .push(a_text_input)
+                .push(a_text_input);
+
+            a_row.into()
         }
     }
 }

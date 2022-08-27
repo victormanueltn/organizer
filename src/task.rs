@@ -1,4 +1,5 @@
 pub struct Task {
+    pub id: usize,
     task_completed: bool,
     description: String,
     state: TaskState,
@@ -11,8 +12,9 @@ pub(crate) enum TaskState {
 }
 
 impl Task {
-    pub fn new(description: String) -> Task {
+    pub fn new(id: usize, description: String) -> Task {
         Task {
+            id: id,
             task_completed: false,
             description,
             state: TaskState::Idle,
@@ -50,19 +52,19 @@ mod tests {
 
     #[test]
     fn correct_task_description() {
-        let task = Task::new("This is a test task".to_string());
+        let task = Task::new(1, "This is a test task".to_string());
         assert_eq!("This is a test task", task.description());
     }
 
     #[test]
     fn empty_task_description() {
-        let task = Task::new("".to_string());
+        let task = Task::new(1, "".to_string());
         assert_eq!("", task.description());
     }
 
     #[test]
     fn edit_description() {
-        let mut task = Task::new("This is a test task".to_string());
+        let mut task = Task::new(1, "This is a test task".to_string());
 
         task.edit("Edited task description".to_string());
         assert_eq!("Edited task description", task.description());
@@ -70,7 +72,7 @@ mod tests {
 
     #[test]
     fn edit_to_empty() {
-        let mut task = Task::new("This is a test task".to_string());
+        let mut task = Task::new(1, "This is a test task".to_string());
 
         task.edit("".to_string());
         assert_eq!("", task.description());
@@ -78,7 +80,7 @@ mod tests {
 
     #[test]
     fn edit_from_empty() {
-        let mut task = Task::new("".to_string());
+        let mut task = Task::new(1, "".to_string());
 
         task.edit("A description".to_string());
         assert_eq!("A description", task.description());
