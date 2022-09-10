@@ -29,13 +29,11 @@ impl Sandbox for Organizer {
     type Message = Message;
 
     fn new() -> Self {
-        Organizer {
-            tasks: vec![Task::new(0, "A task to be completed.".to_string())],
-        }
+        Organizer { tasks: vec![] }
     }
 
     fn title(&self) -> String {
-        String::from("Task")
+        String::from("Organizer")
     }
 
     fn view(&self) -> Element<Message> {
@@ -48,7 +46,7 @@ impl Sandbox for Organizer {
             );
         }
 
-        a_column = add_task_button(a_column);
+        a_column = Organizer::add_task_button(a_column);
 
         a_column.spacing(10).into()
     }
@@ -63,27 +61,9 @@ impl Sandbox for Organizer {
     }
 }
 
-fn add_task_button<'a>(a_row: Column<'a, Message>) -> Column<'a, Message> {
-    let create_task_text = Text::new("Add a task for Victor.")
-        .width(Length::Units(60))
-        .horizontal_alignment(alignment::Horizontal::Center)
-        .size(20);
-    let edit_button = button(create_task_text)
-        .on_press(Message::AddTask)
-        .padding(10);
-
-    a_row
-        .spacing(20)
-        .align_items(iced::Alignment::Center)
-        .push(edit_button)
-}
-
 impl Organizer {
     pub fn update_for_add_task(&mut self) {
-        self.tasks.push(Task::new(
-            self.tasks.len(),
-            "Yet another task for Victor!".to_string(),
-        ))
+        self.tasks.push(Task::new(self.tasks.len(), "".to_string()))
     }
 
     pub fn update_for_task_message(&mut self, task_id: usize, task_message: TaskMessage) {
@@ -95,5 +75,20 @@ impl Organizer {
                 TaskMessage::FinishedEdition => a_task.set_state(TaskState::Idle),
             }
         }
+    }
+
+    pub fn add_task_button<'a>(a_column: Column<'a, Message>) -> Column<'a, Message> {
+        let create_task_text = Text::new("Add a new task")
+            .width(Length::Units(120))
+            .horizontal_alignment(alignment::Horizontal::Center)
+            .size(20);
+        let edit_button = button(create_task_text)
+            .on_press(Message::AddTask)
+            .padding(10);
+
+        a_column
+            .spacing(20)
+            .align_items(iced::Alignment::Center)
+            .push(edit_button)
     }
 }
