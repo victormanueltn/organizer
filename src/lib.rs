@@ -1,9 +1,11 @@
 use iced::alignment;
 use iced::pure::widget::Column;
-use iced::pure::{button, checkbox, column, row, text_input, widget::Text, Element, Sandbox};
+use iced::pure::{button, column, widget::Text, Element, Sandbox};
 use iced::Length;
 mod task;
-use crate::task::{Task, TaskState};
+use task::{Task, TaskState};
+mod tasktoiced;
+use tasktoiced::TaskToIced;
 
 pub struct Organizer {
     tasks: Vec<Task>,
@@ -41,7 +43,8 @@ impl Sandbox for Organizer {
 
         for (index, task) in self.tasks.iter().enumerate() {
             a_column = a_column.push(
-                add_task_view(&task).map(move |message| Message::TaskMessage(index, message)),
+                task.view()
+                    .map(move |message| Message::TaskMessage(index, message)),
             );
         }
 
@@ -56,50 +59,6 @@ impl Sandbox for Organizer {
             Message::TaskMessage(task_id, task_message) => {
                 self.update_for_task_message(task_id, task_message)
             }
-        }
-    }
-}
-
-fn add_task_view<'a>(task: &Task) -> Element<TaskMessage> {
-    match task.state() {
-        TaskState::Idle => {
-            let checkbox_instance = checkbox(
-                task.description().to_string(),
-                task.completed(),
-                TaskMessage::ToggleTaskCompletion,
-            );
-
-            let edit_text = Text::new("Edit")
-                .width(Length::Units(60))
-                .horizontal_alignment(alignment::Horizontal::Center)
-                .size(20);
-            let edit_button = button(edit_text)
-                .on_press(TaskMessage::EditingTask)
-                .padding(10);
-
-            let a_row = row()
-                .spacing(20)
-                .align_items(iced::Alignment::Center)
-                .push(checkbox_instance)
-                .push(edit_button);
-
-            a_row.into()
-        }
-        TaskState::BeingEdited => {
-            let a_text_input = text_input(
-                "Describe your task...",
-                &task.description(),
-                TaskMessage::TextInput,
-            )
-            .padding(10)
-            .on_submit(TaskMessage::FinishedEdition);
-
-            let a_row = row()
-                .spacing(20)
-                .align_items(iced::Alignment::Center)
-                .push(a_text_input);
-
-            a_row.into()
         }
     }
 }
