@@ -52,10 +52,7 @@ impl Sandbox for Organizer {
 
     fn update(&mut self, message: Message) {
         match message {
-            Message::AddTask => self.tasks.push(Task::new(
-                self.tasks.len(),
-                "Yet another task for Victor!".to_string(),
-            )),
+            Message::AddTask => self.update_for_add_task(),
             Message::TaskMessage(task_id, task_message) => {
                 self.update_for_task_message(task_id, task_message)
             }
@@ -123,6 +120,13 @@ fn add_task_button<'a>(a_row: Column<'a, Message>) -> Column<'a, Message> {
 }
 
 impl Organizer {
+    pub fn update_for_add_task(&mut self) {
+        self.tasks.push(Task::new(
+            self.tasks.len(),
+            "Yet another task for Victor!".to_string(),
+        ))
+    }
+
     pub fn update_for_task_message(&mut self, task_id: usize, task_message: TaskMessage) {
         if let Some(a_task) = self.tasks.get_mut(task_id) {
             match task_message {
