@@ -57,16 +57,7 @@ impl Sandbox for Organizer {
                 "Yet another task for Victor!".to_string(),
             )),
             Message::TaskMessage(task_id, task_message) => {
-                if let Some(a_task) = self.tasks.get_mut(task_id) {
-                    match task_message {
-                        TaskMessage::ToggleTaskCompletion(completed) => {
-                            a_task.set_completed(completed)
-                        }
-                        TaskMessage::EditingTask => a_task.set_state(TaskState::BeingEdited),
-                        TaskMessage::TextInput(description) => a_task.edit(description),
-                        TaskMessage::FinishedEdition => a_task.set_state(TaskState::Idle),
-                    }
-                }
+                self.update_for_task_message(task_id, task_message)
             }
         }
     }
@@ -129,4 +120,17 @@ fn add_task_button<'a>(a_row: Column<'a, Message>) -> Column<'a, Message> {
         .spacing(20)
         .align_items(iced::Alignment::Center)
         .push(edit_button)
+}
+
+impl Organizer {
+    pub fn update_for_task_message(&mut self, task_id: usize, task_message: TaskMessage) {
+        if let Some(a_task) = self.tasks.get_mut(task_id) {
+            match task_message {
+                TaskMessage::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
+                TaskMessage::EditingTask => a_task.set_state(TaskState::BeingEdited),
+                TaskMessage::TextInput(description) => a_task.edit(description),
+                TaskMessage::FinishedEdition => a_task.set_state(TaskState::Idle),
+            }
+        }
+    }
 }
