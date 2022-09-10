@@ -39,10 +39,9 @@ impl Sandbox for Organizer {
     fn view(&self) -> Element<Message> {
         let mut a_column = column();
 
-        for (index, _) in self.tasks.iter().enumerate() {
+        for (index, task) in self.tasks.iter().enumerate() {
             a_column = a_column.push(
-                add_task_view(&self.tasks, index)
-                    .map(move |message| Message::TaskMessage(index, message)),
+                add_task_view(&task).map(move |message| Message::TaskMessage(index, message)),
             );
         }
 
@@ -73,13 +72,12 @@ impl Sandbox for Organizer {
     }
 }
 
-fn add_task_view<'a>(tasks: &Vec<Task>, task_id: usize) -> Element<TaskMessage> {
-    let a_task = &tasks[task_id];
-    match a_task.state() {
+fn add_task_view<'a>(task: &Task) -> Element<TaskMessage> {
+    match task.state() {
         TaskState::Idle => {
             let checkbox_instance = checkbox(
-                a_task.description().to_string(),
-                a_task.completed(),
+                task.description().to_string(),
+                task.completed(),
                 TaskMessage::ToggleTaskCompletion,
             );
 
@@ -102,7 +100,7 @@ fn add_task_view<'a>(tasks: &Vec<Task>, task_id: usize) -> Element<TaskMessage> 
         TaskState::BeingEdited => {
             let a_text_input = text_input(
                 "Describe your task...",
-                &a_task.description(),
+                &task.description(),
                 TaskMessage::TextInput,
             )
             .padding(10)
