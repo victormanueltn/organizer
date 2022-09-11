@@ -62,7 +62,7 @@ impl Organizer {
         if let Some(a_task) = self.tasks.get_mut(task_id) {
             match task_message {
                 TaskMessage::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
-                TaskMessage::EditingTask => a_task.set_state(TaskState::BeingEdited),
+                TaskMessage::EditTask => a_task.set_state(TaskState::BeingEdited),
                 TaskMessage::TextInput(description) => a_task.edit(description),
                 TaskMessage::FinishedEdition => a_task.set_state(TaskState::Idle),
                 TaskMessage::DeleteTask => {

@@ -14,7 +14,7 @@ pub(crate) enum TaskState {
 #[derive(Debug, Clone)]
 pub enum TaskMessage {
     ToggleTaskCompletion(bool),
-    EditingTask,
+    EditTask,
     TextInput(String),
     FinishedEdition,
     DeleteTask,

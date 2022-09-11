@@ -27,7 +27,7 @@ impl TaskToIced for Task {
                     TaskMessage::ToggleTaskCompletion,
                 );
 
-                let edit_button = add_button("Edit", TaskMessage::EditingTask);
+                let edit_button = add_button("Edit", TaskMessage::EditTask);
                 let delete_button = add_button("Delete", TaskMessage::DeleteTask);
 
                 let a_row = row()
