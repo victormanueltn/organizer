@@ -64,3 +64,11 @@ jobs:
         uses: actions-rs/tarpaulin@v0.1
         with:
           args: '--ignore-tests --out Html'
+      
+      - name: Upload test coverage output
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-coverage
+          path: tarpaulin-report.html
+          
+          
