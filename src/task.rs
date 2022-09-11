@@ -11,6 +11,15 @@ pub(crate) enum TaskState {
     BeingEdited,
 }
 
+#[derive(Debug, Clone)]
+pub enum TaskMessage {
+    ToggleTaskCompletion(bool),
+    EditingTask,
+    TextInput(String),
+    FinishedEdition,
+    DeleteTask,
+}
+
 impl Task {
     pub fn new(id: usize, description: String) -> Task {
         Task {

@@ -3,7 +3,7 @@ use iced::pure::widget::Column;
 use iced::pure::{button, column, widget::Text, Element, Sandbox};
 use iced::Length;
 mod task;
-use task::{Task, TaskState};
+use task::{Task, TaskMessage, TaskState};
 mod tasktoiced;
 use tasktoiced::TaskToIced;
 
@@ -15,14 +15,6 @@ pub struct Organizer {
 pub enum Message {
     AddTask,
     TaskMessage(usize, TaskMessage),
-}
-
-#[derive(Debug, Clone)]
-pub enum TaskMessage {
-    ToggleTaskCompletion(bool),
-    EditingTask,
-    TextInput(String),
-    FinishedEdition,
 }
 
 impl Sandbox for Organizer {
@@ -73,6 +65,9 @@ impl Organizer {
                 TaskMessage::EditingTask => a_task.set_state(TaskState::BeingEdited),
                 TaskMessage::TextInput(description) => a_task.edit(description),
                 TaskMessage::FinishedEdition => a_task.set_state(TaskState::Idle),
+                TaskMessage::DeleteTask => {
+                    self.tasks.remove(task_id);
+                }
             }
         }
     }

@@ -2,11 +2,19 @@ use crate::Task;
 use crate::TaskMessage;
 use crate::TaskState;
 use iced::alignment;
-use iced::pure::{button, checkbox, row, text_input, widget::Text, Element};
+use iced::pure::{button, checkbox, row, text_input, widget::Button, widget::Text, Element};
 use iced::Length;
 
 pub(crate) trait TaskToIced {
-    fn view<'a>(&self) -> Element<TaskMessage>;
+    fn view(&self) -> Element<TaskMessage>;
+}
+
+fn add_button<'a>(text: &str, task_message: TaskMessage) -> Button<'a, TaskMessage> {
+    let edit_text = Text::new(text)
+        .width(Length::Units(60))
+        .horizontal_alignment(alignment::Horizontal::Center)
+        .size(20);
+    button(edit_text).on_press(task_message).padding(10)
 }
 
 impl TaskToIced for Task {
@@ -19,19 +27,15 @@ impl TaskToIced for Task {
                     TaskMessage::ToggleTaskCompletion,
                 );
 
-                let edit_text = Text::new("Edit")
-                    .width(Length::Units(60))
-                    .horizontal_alignment(alignment::Horizontal::Center)
-                    .size(20);
-                let edit_button = button(edit_text)
-                    .on_press(TaskMessage::EditingTask)
-                    .padding(10);
+                let edit_button = add_button("Edit", TaskMessage::EditingTask);
+                let delete_button = add_button("Delete", TaskMessage::DeleteTask);
 
                 let a_row = row()
                     .spacing(20)
                     .align_items(iced::Alignment::Center)
                     .push(checkbox_instance)
-                    .push(edit_button);
+                    .push(edit_button)
+                    .push(delete_button);
 
                 a_row.into()
             }
