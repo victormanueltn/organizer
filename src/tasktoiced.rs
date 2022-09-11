@@ -42,7 +42,7 @@ impl TaskToIced for Task {
             TaskState::BeingEdited => {
                 let a_text_input = text_input(
                     "Describe your task...",
-                    &self.description(),
+                    self.description(),
                     TaskMessage::TextInput,
                 )
                 .padding(10)

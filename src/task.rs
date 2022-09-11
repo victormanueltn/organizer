@@ -23,7 +23,7 @@ pub enum TaskMessage {
 impl Task {
     pub fn new(id: usize, description: String) -> Task {
         Task {
-            id: id,
+            id,
             task_completed: false,
             description,
             state: TaskState::Idle,

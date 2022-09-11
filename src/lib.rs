@@ -72,7 +72,7 @@ impl Organizer {
         }
     }
 
-    pub fn add_task_button<'a>(a_column: Column<'a, Message>) -> Column<'a, Message> {
+    pub fn add_task_button(a_column: Column<Message>) -> Column<Message> {
         let create_task_text = Text::new("Add a new task")
             .width(Length::Units(120))
             .horizontal_alignment(alignment::Horizontal::Center)
