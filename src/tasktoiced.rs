@@ -16,7 +16,7 @@ fn add_button<'a>(text: &str, task_message: task::Message) -> Button<'a, task::M
 }
 
 impl TaskToIced for Task {
-    fn view<'a>(&self) -> Element<task::Message> {
+    fn view(&self) -> Element<task::Message> {
         match self.state() {
             task::State::Idle => {
                 let checkbox_instance = checkbox(
