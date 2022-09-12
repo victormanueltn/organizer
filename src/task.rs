@@ -2,17 +2,17 @@ pub struct Task {
     pub id: usize,
     task_completed: bool,
     description: String,
-    state: TaskState,
+    state: State,
 }
 
 #[derive(Clone, Debug, Copy)]
-pub(crate) enum TaskState {
+pub(crate) enum State {
     Idle,
     BeingEdited,
 }
 
 #[derive(Debug, Clone)]
-pub enum TaskMessage {
+pub enum Message {
     ToggleTaskCompletion(bool),
     EditTask,
     TextInput(String),
@@ -26,7 +26,7 @@ impl Task {
             id,
             task_completed: false,
             description,
-            state: TaskState::Idle,
+            state: State::Idle,
         }
     }
 
@@ -42,11 +42,11 @@ impl Task {
         self.description = description;
     }
 
-    pub(crate) fn set_state(&mut self, state: TaskState) {
+    pub(crate) fn set_state(&mut self, state: State) {
         self.state = state;
     }
 
-    pub(crate) fn state(&self) -> TaskState {
+    pub(crate) fn state(&self) -> State {
         self.state
     }
 
@@ -119,15 +119,15 @@ mod tests {
     #[test]
     fn changing_state() {
         let mut task = Task::new(1, "".to_string());
-        assert!(matches!(task.state(), TaskState::Idle));
+        assert!(matches!(task.state(), State::Idle));
 
-        task.set_state(TaskState::Idle);
-        assert!(matches!(task.state(), TaskState::Idle));
+        task.set_state(State::Idle);
+        assert!(matches!(task.state(), State::Idle));
 
-        task.set_state(TaskState::BeingEdited);
-        assert!(matches!(task.state(), TaskState::BeingEdited));
+        task.set_state(State::BeingEdited);
+        assert!(matches!(task.state(), State::BeingEdited));
 
-        task.set_state(TaskState::Idle);
-        assert!(matches!(task.state(), TaskState::Idle));
+        task.set_state(State::Idle);
+        assert!(matches!(task.state(), State::Idle));
     }
 }

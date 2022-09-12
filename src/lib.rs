@@ -3,7 +3,7 @@ use iced::pure::widget::Column;
 use iced::pure::{button, column, widget::Text, Element, Sandbox};
 use iced::Length;
 mod task;
-use task::{Task, TaskMessage, TaskState};
+use task::Task;
 mod tasktoiced;
 use tasktoiced::TaskToIced;
 
@@ -14,7 +14,7 @@ pub struct Organizer {
 #[derive(Debug, Clone)]
 pub enum Message {
     AddTask,
-    TaskMessage(usize, TaskMessage),
+    TaskMessage(usize, task::Message),
 }
 
 impl Sandbox for Organizer {
@@ -58,14 +58,14 @@ impl Organizer {
         self.tasks.push(Task::new(self.tasks.len(), "".to_string()))
     }
 
-    pub fn update_for_task_message(&mut self, task_id: usize, task_message: TaskMessage) {
+    pub fn update_for_task_message(&mut self, task_id: usize, task_message: task::Message) {
         if let Some(a_task) = self.tasks.get_mut(task_id) {
             match task_message {
-                TaskMessage::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
-                TaskMessage::EditTask => a_task.set_state(TaskState::BeingEdited),
-                TaskMessage::TextInput(description) => a_task.edit(description),
-                TaskMessage::FinishedEdition => a_task.set_state(TaskState::Idle),
-                TaskMessage::DeleteTask => {
+                task::Message::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
+                task::Message::EditTask => a_task.set_state(task::State::BeingEdited),
+                task::Message::TextInput(description) => a_task.edit(description),
+                task::Message::FinishedEdition => a_task.set_state(task::State::Idle),
+                task::Message::DeleteTask => {
                     self.tasks.remove(task_id);
                 }
             }
