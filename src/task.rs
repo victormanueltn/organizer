@@ -21,11 +21,11 @@ pub enum Message {
 }
 
 impl Task {
-    pub fn new(id: usize, description: String) -> Task {
+    pub fn new(id: usize) -> Task {
         Task {
             id,
             task_completed: false,
-            description,
+            description: "".to_string(),
             state: State::Idle,
         }
     }
@@ -38,8 +38,8 @@ impl Task {
         self.task_completed = completed;
     }
 
-    pub fn edit(&mut self, description: String) {
-        self.description = description;
+    pub fn edit(&mut self, description: &str) {
+        self.description = description.to_string();
     }
 
     pub(crate) fn set_state(&mut self, state: State) {
@@ -61,43 +61,47 @@ mod tests {
 
     #[test]
     fn correct_task_description() {
-        let task = Task::new(1, "This is a test task".to_string());
+        let mut task = Task::new(1);
+
+        task.edit("This is a test task");
         assert_eq!("This is a test task", task.description());
     }
 
     #[test]
     fn empty_task_description() {
-        let task = Task::new(1, "".to_string());
+        let task = Task::new(1);
         assert_eq!("", task.description());
     }
 
     #[test]
     fn edit_description() {
-        let mut task = Task::new(1, "This is a test task".to_string());
+        let mut task = Task::new(1);
+        task.edit("This is a test task");
 
-        task.edit("Edited task description".to_string());
+        task.edit("Edited task description");
         assert_eq!("Edited task description", task.description());
     }
 
     #[test]
     fn edit_to_empty() {
-        let mut task = Task::new(1, "This is a test task".to_string());
+        let mut task = Task::new(1);
+        task.edit("This is a test task");
 
-        task.edit("".to_string());
+        task.edit("");
         assert_eq!("", task.description());
     }
 
     #[test]
     fn edit_from_empty() {
-        let mut task = Task::new(1, "".to_string());
+        let mut task = Task::new(1);
 
-        task.edit("A description".to_string());
+        task.edit("A description");
         assert_eq!("A description", task.description());
     }
 
     #[test]
     fn completed_or_not_completed() {
-        let mut task = Task::new(1, "".to_string());
+        let mut task = Task::new(1);
         assert!(!task.completed());
 
         task.set_completed(false);
@@ -118,7 +122,7 @@ mod tests {
 
     #[test]
     fn changing_state() {
-        let mut task = Task::new(1, "".to_string());
+        let mut task = Task::new(1);
         assert!(matches!(task.state(), State::Idle));
 
         task.set_state(State::Idle);

@@ -55,7 +55,7 @@ impl Sandbox for Organizer {
 
 impl Organizer {
     pub fn update_for_add_task(&mut self) {
-        self.tasks.push(Task::new(self.tasks.len(), "".to_string()))
+        self.tasks.push(Task::new(self.tasks.len()))
     }
 
     pub fn update_for_task_message(&mut self, task_id: usize, task_message: task::Message) {
@@ -63,7 +63,7 @@ impl Organizer {
             match task_message {
                 task::Message::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
                 task::Message::EditTask => a_task.set_state(task::State::BeingEdited),
-                task::Message::TextInput(description) => a_task.edit(description),
+                task::Message::TextInput(description) => a_task.edit(&description),
                 task::Message::FinishedEdition => a_task.set_state(task::State::Idle),
                 task::Message::DeleteTask => {
                     self.tasks.remove(task_id);
