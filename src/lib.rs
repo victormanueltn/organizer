@@ -28,6 +28,7 @@ impl Sandbox for Organizer {
         String::from("Organizer")
     }
 
+    #[cfg(not(tarpaulin_include))]
     fn view(&self) -> Element<Message> {
         let mut a_column = column();
 
@@ -58,6 +59,7 @@ impl Organizer {
         self.tasks.push(Task::new(self.tasks.len()))
     }
 
+    #[cfg(not(tarpaulin_include))]
     pub fn update_for_task_message(&mut self, task_id: usize, task_message: task::Message) {
         if let Some(a_task) = self.tasks.get_mut(task_id) {
             match task_message {
@@ -72,6 +74,7 @@ impl Organizer {
         }
     }
 
+    #[cfg(not(tarpaulin_include))]
     pub fn add_task_button(a_column: Column<Message>) -> Column<Message> {
         let create_task_text = Text::new("Add a new task")
             .width(Length::Units(120))
