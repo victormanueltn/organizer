@@ -5,7 +5,7 @@ pub struct Task {
     state: TaskState,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Debug, Copy)]
 pub(crate) enum TaskState {
     Idle,
     BeingEdited,
@@ -93,5 +93,41 @@ mod tests {
 
         task.edit("A description".to_string());
         assert_eq!("A description", task.description());
+    }
+
+    #[test]
+    fn completed_or_not_completed() {
+        let mut task = Task::new(1, "".to_string());
+        assert!(!task.completed());
+
+        task.set_completed(false);
+        assert!(!task.completed());
+
+        task.set_completed(false);
+        assert!(!task.completed());
+
+        task.set_completed(true);
+        assert!(task.completed());
+
+        task.set_completed(true);
+        assert!(task.completed());
+
+        task.set_completed(false);
+        assert!(!task.completed());
+    }
+
+    #[test]
+    fn changing_state() {
+        let mut task = Task::new(1, "".to_string());
+        assert!(matches!(task.state(), TaskState::Idle));
+
+        task.set_state(TaskState::Idle);
+        assert!(matches!(task.state(), TaskState::Idle));
+
+        task.set_state(TaskState::BeingEdited);
+        assert!(matches!(task.state(), TaskState::BeingEdited));
+
+        task.set_state(TaskState::Idle);
+        assert!(matches!(task.state(), TaskState::Idle));
     }
 }
