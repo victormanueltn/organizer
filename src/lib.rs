@@ -46,21 +46,20 @@ impl Sandbox for Organizer {
 
     fn update(&mut self, message: Message) {
         match message {
-            Message::AddTask => self.update_for_add_task(),
+            Message::AddTask => self.add_task(),
             Message::TaskMessage(task_id, task_message) => {
-                self.update_for_task_message(task_id, task_message)
+                self.process_task_message(task_id, task_message)
             }
         }
     }
 }
 
 impl Organizer {
-    pub fn update_for_add_task(&mut self) {
+    pub fn add_task(&mut self) {
         self.tasks.push(Task::new(self.tasks.len()))
     }
 
-    #[cfg(not(tarpaulin_include))]
-    pub fn update_for_task_message(&mut self, task_id: usize, task_message: task::Message) {
+    pub fn process_task_message(&mut self, task_id: usize, task_message: task::Message) {
         if let Some(a_task) = self.tasks.get_mut(task_id) {
             match task_message {
                 task::Message::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
@@ -88,5 +87,57 @@ impl Organizer {
             .spacing(20)
             .align_items(iced::Alignment::Center)
             .push(edit_button)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn add_task() {
+        let mut organizer = Organizer::new();
+        assert_eq!(organizer.tasks.len(), 0);
+
+        organizer.add_task();
+        assert_eq!(organizer.tasks.len(), 1);
+
+        organizer.add_task();
+        organizer.add_task();
+        organizer.add_task();
+        assert_eq!(organizer.tasks.len(), 4);
+    }
+
+    mod process_task_message {
+        use super::*;
+
+        #[test]
+        fn process_task_message_toggle_task_completion() {
+            let mut organizer = Organizer::new();
+            organizer.add_task();
+
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert!(!task.completed());
+            }
+
+            organizer.process_task_message(0, task::Message::ToggleTaskCompletion(false));
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert!(!task.completed());
+            }
+
+            organizer.process_task_message(0, task::Message::ToggleTaskCompletion(true));
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert!(task.completed());
+            }
+
+            organizer.process_task_message(0, task::Message::ToggleTaskCompletion(false));
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert!(!task.completed());
+            }
+        }
     }
 }
