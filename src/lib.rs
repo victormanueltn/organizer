@@ -95,6 +95,12 @@ mod tests {
     use super::*;
 
     #[test]
+    fn check_title() {
+        let organizer = Organizer::new();
+        assert_eq!(organizer.title(), "Organizer");
+    }
+
+    #[test]
     fn add_task() {
         let mut organizer = Organizer::new();
         assert_eq!(organizer.tasks.len(), 0);
@@ -112,7 +118,7 @@ mod tests {
         use super::*;
 
         #[test]
-        fn process_task_message_toggle_task_completion() {
+        fn toggle_task_completion() {
             let mut organizer = Organizer::new();
             organizer.add_task();
 
@@ -138,6 +144,67 @@ mod tests {
                 let task = organizer.tasks.get(0).unwrap();
                 assert!(!task.completed());
             }
+        }
+
+        #[test]
+        fn edit_task() {
+            let mut organizer = Organizer::new();
+            organizer.add_task();
+
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert!(matches!(task.state(), task::State::Idle));
+            }
+
+            organizer.process_task_message(0, task::Message::EditTask);
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert!(matches!(task.state(), task::State::BeingEdited));
+            }
+        }
+
+        #[test]
+        fn text_input() {
+            let mut organizer = Organizer::new();
+            organizer.add_task();
+
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert_eq!(task.description(), "");
+            }
+
+            organizer
+                .process_task_message(0, task::Message::TextInput("A description".to_string()));
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert_eq!(task.description(), "A description");
+            }
+        }
+
+        #[test]
+        fn finished_edition() {
+            let mut organizer = Organizer::new();
+            organizer.add_task();
+            organizer.process_task_message(0, task::Message::EditTask);
+            organizer.process_task_message(0, task::Message::FinishedEdition);
+            {
+                let task = organizer.tasks.get(0).unwrap();
+                assert!(matches!(task.state(), task::State::Idle));
+            }
+        }
+
+        #[test]
+        fn delete_task() {
+            let mut organizer = Organizer::new();
+            organizer.add_task();
+            organizer.add_task();
+            assert_eq!(organizer.tasks.len(), 2);
+
+            organizer.process_task_message(0, task::Message::DeleteTask);
+            assert_eq!(organizer.tasks.len(), 1);
+
+            organizer.process_task_message(0, task::Message::DeleteTask);
+            assert_eq!(organizer.tasks.len(), 0);
         }
     }
 }
