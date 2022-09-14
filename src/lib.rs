@@ -48,6 +48,9 @@ impl Sandbox for Organizer {
         match message {
             Message::AddTask => self.add_task(),
             Message::TaskMessage(task_id, task_message) => {
+                if task_id > self.tasks.len() {
+                    panic!("Tried to update inexisting task.")
+                };
                 self.process_task_message(task_id, task_message)
             }
         }
@@ -205,6 +208,75 @@ mod tests {
 
             organizer.process_task_message(0, task::Message::DeleteTask);
             assert_eq!(organizer.tasks.len(), 0);
+
+            organizer.process_task_message(1, task::Message::DeleteTask);
+            assert_eq!(organizer.tasks.len(), 0);
+        }
+    }
+
+    mod update {
+        use super::*;
+
+        #[test]
+        fn add_task() {
+            let mut organizer = Organizer::new();
+            organizer.update(Message::AddTask);
+            assert_eq!(organizer.tasks.len(), 1);
+        }
+
+        #[test]
+        #[should_panic]
+        fn message_to_inexisting_task() {
+            let mut organizer = Organizer::new();
+            organizer.update(Message::AddTask);
+
+            organizer.update(Message::TaskMessage(1, task::Message::DeleteTask));
+            assert_eq!(organizer.tasks.len(), 2);
+        }
+
+        #[test]
+        fn task_message() {
+            let mut organizer = Organizer::new();
+
+            organizer.update(Message::AddTask);
+            organizer.update(Message::AddTask);
+            organizer.update(Message::AddTask);
+            assert_eq!(organizer.tasks.len(), 3);
+
+            organizer.update(Message::TaskMessage(0, task::Message::EditTask));
+            organizer.update(Message::TaskMessage(1, task::Message::EditTask));
+            organizer.update(Message::TaskMessage(2, task::Message::EditTask));
+
+            organizer.tasks.iter().for_each(|task| {
+                assert!(matches!(task.state(), task::State::BeingEdited));
+            });
+
+            organizer.update(Message::TaskMessage(
+                0,
+                task::Message::TextInput("A".to_string()),
+            ));
+            organizer.update(Message::TaskMessage(
+                1,
+                task::Message::TextInput("B".to_string()),
+            ));
+            organizer.update(Message::TaskMessage(
+                2,
+                task::Message::TextInput("C".to_string()),
+            ));
+
+            organizer.update(Message::TaskMessage(0, task::Message::FinishedEdition));
+            organizer.update(Message::TaskMessage(1, task::Message::FinishedEdition));
+            organizer.update(Message::TaskMessage(2, task::Message::FinishedEdition));
+
+            organizer.tasks.iter().for_each(|task| {
+                assert!(matches!(task.state(), task::State::Idle));
+            });
+
+            organizer.update(Message::TaskMessage(1, task::Message::DeleteTask));
+            assert_eq!(organizer.tasks.len(), 2);
+
+            assert_eq!(organizer.tasks[0].description(), "A");
+            assert_eq!(organizer.tasks[1].description(), "C");
         }
     }
 }
