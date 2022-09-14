@@ -7,6 +7,7 @@ pub(crate) trait TaskToIced {
     fn view(&self) -> Element<task::Message>;
 }
 
+#[cfg(not(tarpaulin_include))]
 fn add_button<'a>(text: &str, task_message: task::Message) -> Button<'a, task::Message> {
     let edit_text = Text::new(text)
         .width(Length::Units(60))
@@ -15,6 +16,7 @@ fn add_button<'a>(text: &str, task_message: task::Message) -> Button<'a, task::M
     button(edit_text).on_press(task_message).padding(10)
 }
 
+#[cfg(not(tarpaulin_include))]
 impl TaskToIced for Task {
     fn view(&self) -> Element<task::Message> {
         match self.state() {
