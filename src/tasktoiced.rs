@@ -9,11 +9,11 @@ pub(crate) trait TaskToIced {
 
 #[cfg(not(tarpaulin_include))]
 fn add_button<'a>(text: &str, task_message: task::Message) -> Button<'a, task::Message> {
-    let edit_text = Text::new(text)
+    let text = Text::new(text)
         .width(Length::Units(60))
         .horizontal_alignment(alignment::Horizontal::Center)
         .size(20);
-    button(edit_text).on_press(task_message).padding(10)
+    button(text).on_press(task_message).padding(10)
 }
 
 #[cfg(not(tarpaulin_include))]
