@@ -18,6 +18,7 @@ pub enum Message {
     TaskMessage(usize, task::Message),
 }
 
+#[cfg(not(tarpaulin_include))]
 impl Sandbox for Organizer {
     type Message = Message;
 
