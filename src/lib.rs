@@ -40,7 +40,9 @@ impl Sandbox for Organizer {
             );
         }
 
-        a_column = Organizer::add_task_button(a_column).spacing(10);
+        a_column = Organizer::add_task_button(a_column)
+            .spacing(10)
+            .align_items(iced::Alignment::Start);
 
         container(a_column).width(Length::Fill).center_x().into()
     }
