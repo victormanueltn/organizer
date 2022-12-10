@@ -1,4 +1,5 @@
 use iced::alignment;
+use iced::pure::container;
 use iced::pure::widget::Column;
 use iced::pure::{button, column, widget::Text, Element, Sandbox};
 use iced::Length;
@@ -39,9 +40,9 @@ impl Sandbox for Organizer {
             );
         }
 
-        a_column = Organizer::add_task_button(a_column);
+        a_column = Organizer::add_task_button(a_column).spacing(10);
 
-        a_column.spacing(10).into()
+        container(a_column).width(Length::Fill).center_x().into()
     }
 
     fn update(&mut self, message: Message) {
