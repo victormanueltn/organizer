@@ -63,7 +63,7 @@ jobs:
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
-          args: '--ignore-tests --fail-under 89 --out Html'
+          args: '--ignore-tests --ignore-files lib.rs --fail-under 89 --out Html'
       
       - name: Upload test coverage output
         uses: actions/upload-artifact@v3
