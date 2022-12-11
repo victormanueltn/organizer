@@ -1,6 +1,7 @@
 use crate::task::{self, Task};
 use iced::alignment;
-use iced::pure::{button, checkbox, row, text_input, widget::Button, widget::Text, Element};
+use iced::widget::{button, checkbox, row, text_input, Button, Text};
+use iced::Element;
 use iced::Length;
 
 pub(crate) trait TaskToIced {
@@ -8,7 +9,7 @@ pub(crate) trait TaskToIced {
 }
 
 #[cfg(not(tarpaulin_include))]
-fn add_button<'a>(text: &str, task_message: task::Message) -> Button<'a, task::Message> {
+fn add_button<'a>(text: &'a str, task_message: task::Message) -> Button<'a, task::Message> {
     let text = Text::new(text)
         .width(Length::Units(60))
         .horizontal_alignment(alignment::Horizontal::Center)
@@ -30,7 +31,7 @@ impl TaskToIced for Task {
                 let edit_button = add_button("Edit", task::Message::EditTask);
                 let delete_button = add_button("Delete", task::Message::DeleteTask);
 
-                let a_row = row()
+                let a_row = row(vec![])
                     .spacing(20)
                     .align_items(iced::Alignment::Center)
                     .push(checkbox_instance)
@@ -48,7 +49,7 @@ impl TaskToIced for Task {
                 .padding(10)
                 .on_submit(task::Message::FinishedEdition);
 
-                let a_row = row()
+                let a_row = row(vec![])
                     .spacing(20)
                     .align_items(iced::Alignment::Center)
                     .push(a_text_input);

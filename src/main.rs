@@ -1,4 +1,4 @@
-use iced::pure::Application;
+use iced::Application;
 use organizer::Organizer;
 
 #[cfg(not(tarpaulin_include))]

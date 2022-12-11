@@ -1,8 +1,10 @@
 use iced::alignment;
-use iced::pure::container;
-use iced::pure::widget::Column;
-use iced::pure::{button, column, widget::Text, Element, Sandbox};
+use iced::widget::container;
+use iced::widget::Column;
+use iced::widget::{button, column, Text};
+use iced::Element;
 use iced::Length;
+use iced::Sandbox;
 mod task;
 use task::Task;
 mod tasktoiced;
@@ -36,7 +38,7 @@ impl Sandbox for Organizer {
 
     #[cfg(not(tarpaulin_include))]
     fn view(&self) -> Element<Message> {
-        let mut a_column = column();
+        let mut a_column = column(vec![]);
 
         for (index, task) in self.data.tasks.iter().enumerate() {
             a_column = a_column.push(
