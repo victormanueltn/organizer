@@ -7,9 +7,11 @@ mod task;
 use task::Task;
 mod tasktoiced;
 use tasktoiced::TaskToIced;
+mod data;
+use data::Data;
 
 pub struct Organizer {
-    tasks: Vec<Task>,
+    data: Data,
 }
 
 #[derive(Debug, Clone)]
@@ -23,7 +25,9 @@ impl Sandbox for Organizer {
     type Message = Message;
 
     fn new() -> Self {
-        Organizer { tasks: vec![] }
+        Organizer {
+            data: Data { tasks: vec![] },
+        }
     }
 
     fn title(&self) -> String {
@@ -34,7 +38,7 @@ impl Sandbox for Organizer {
     fn view(&self) -> Element<Message> {
         let mut a_column = column();
 
-        for (index, task) in self.tasks.iter().enumerate() {
+        for (index, task) in self.data.tasks.iter().enumerate() {
             a_column = a_column.push(
                 task.view()
                     .map(move |message| Message::TaskMessage(index, message)),
@@ -52,7 +56,7 @@ impl Sandbox for Organizer {
         match message {
             Message::AddTask => self.add_task(),
             Message::TaskMessage(task_id, task_message) => {
-                if task_id > self.tasks.len() {
+                if task_id > self.data.tasks.len() {
                     panic!("Tried to update inexisting task.")
                 };
                 self.process_task_message(task_id, task_message)
@@ -63,18 +67,18 @@ impl Sandbox for Organizer {
 
 impl Organizer {
     pub fn add_task(&mut self) {
-        self.tasks.push(Task::new(self.tasks.len()))
+        self.data.tasks.push(Task::new(self.data.tasks.len()))
     }
 
     pub fn process_task_message(&mut self, task_id: usize, task_message: task::Message) {
-        if let Some(a_task) = self.tasks.get_mut(task_id) {
+        if let Some(a_task) = self.data.tasks.get_mut(task_id) {
             match task_message {
                 task::Message::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
                 task::Message::EditTask => a_task.set_state(task::State::BeingEdited),
                 task::Message::TextInput(description) => a_task.edit(&description),
                 task::Message::FinishedEdition => a_task.set_state(task::State::Idle),
                 task::Message::DeleteTask => {
-                    self.tasks.remove(task_id);
+                    self.data.tasks.remove(task_id);
                 }
             }
         }
@@ -110,15 +114,15 @@ mod tests {
     #[test]
     fn add_task() {
         let mut organizer = Organizer::new();
-        assert_eq!(organizer.tasks.len(), 0);
+        assert_eq!(organizer.data.tasks.len(), 0);
 
         organizer.add_task();
-        assert_eq!(organizer.tasks.len(), 1);
+        assert_eq!(organizer.data.tasks.len(), 1);
 
         organizer.add_task();
         organizer.add_task();
         organizer.add_task();
-        assert_eq!(organizer.tasks.len(), 4);
+        assert_eq!(organizer.data.tasks.len(), 4);
     }
 
     mod process_task_message {
@@ -130,25 +134,25 @@ mod tests {
             organizer.add_task();
 
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert!(!task.completed());
             }
 
             organizer.process_task_message(0, task::Message::ToggleTaskCompletion(false));
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert!(!task.completed());
             }
 
             organizer.process_task_message(0, task::Message::ToggleTaskCompletion(true));
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert!(task.completed());
             }
 
             organizer.process_task_message(0, task::Message::ToggleTaskCompletion(false));
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert!(!task.completed());
             }
         }
@@ -159,13 +163,13 @@ mod tests {
             organizer.add_task();
 
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert!(matches!(task.state(), task::State::Idle));
             }
 
             organizer.process_task_message(0, task::Message::EditTask);
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert!(matches!(task.state(), task::State::BeingEdited));
             }
         }
@@ -176,14 +180,14 @@ mod tests {
             organizer.add_task();
 
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert_eq!(task.description(), "");
             }
 
             organizer
                 .process_task_message(0, task::Message::TextInput("A description".to_string()));
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert_eq!(task.description(), "A description");
             }
         }
@@ -195,7 +199,7 @@ mod tests {
             organizer.process_task_message(0, task::Message::EditTask);
             organizer.process_task_message(0, task::Message::FinishedEdition);
             {
-                let task = organizer.tasks.get(0).unwrap();
+                let task = organizer.data.tasks.get(0).unwrap();
                 assert!(matches!(task.state(), task::State::Idle));
             }
         }
@@ -205,16 +209,16 @@ mod tests {
             let mut organizer = Organizer::new();
             organizer.add_task();
             organizer.add_task();
-            assert_eq!(organizer.tasks.len(), 2);
+            assert_eq!(organizer.data.tasks.len(), 2);
 
             organizer.process_task_message(0, task::Message::DeleteTask);
-            assert_eq!(organizer.tasks.len(), 1);
+            assert_eq!(organizer.data.tasks.len(), 1);
 
             organizer.process_task_message(0, task::Message::DeleteTask);
-            assert_eq!(organizer.tasks.len(), 0);
+            assert_eq!(organizer.data.tasks.len(), 0);
 
             organizer.process_task_message(1, task::Message::DeleteTask);
-            assert_eq!(organizer.tasks.len(), 0);
+            assert_eq!(organizer.data.tasks.len(), 0);
         }
     }
 
@@ -225,7 +229,7 @@ mod tests {
         fn add_task() {
             let mut organizer = Organizer::new();
             organizer.update(Message::AddTask);
-            assert_eq!(organizer.tasks.len(), 1);
+            assert_eq!(organizer.data.tasks.len(), 1);
         }
 
         #[test]
@@ -235,7 +239,7 @@ mod tests {
             organizer.update(Message::AddTask);
 
             organizer.update(Message::TaskMessage(1, task::Message::DeleteTask));
-            assert_eq!(organizer.tasks.len(), 2);
+            assert_eq!(organizer.data.tasks.len(), 2);
         }
 
         #[test]
@@ -245,13 +249,13 @@ mod tests {
             organizer.update(Message::AddTask);
             organizer.update(Message::AddTask);
             organizer.update(Message::AddTask);
-            assert_eq!(organizer.tasks.len(), 3);
+            assert_eq!(organizer.data.tasks.len(), 3);
 
             organizer.update(Message::TaskMessage(0, task::Message::EditTask));
             organizer.update(Message::TaskMessage(1, task::Message::EditTask));
             organizer.update(Message::TaskMessage(2, task::Message::EditTask));
 
-            organizer.tasks.iter().for_each(|task| {
+            organizer.data.tasks.iter().for_each(|task| {
                 assert!(matches!(task.state(), task::State::BeingEdited));
             });
 
@@ -272,15 +276,15 @@ mod tests {
             organizer.update(Message::TaskMessage(1, task::Message::FinishedEdition));
             organizer.update(Message::TaskMessage(2, task::Message::FinishedEdition));
 
-            organizer.tasks.iter().for_each(|task| {
+            organizer.data.tasks.iter().for_each(|task| {
                 assert!(matches!(task.state(), task::State::Idle));
             });
 
             organizer.update(Message::TaskMessage(1, task::Message::DeleteTask));
-            assert_eq!(organizer.tasks.len(), 2);
+            assert_eq!(organizer.data.tasks.len(), 2);
 
-            assert_eq!(organizer.tasks[0].description(), "A");
-            assert_eq!(organizer.tasks[1].description(), "C");
+            assert_eq!(organizer.data.tasks[0].description(), "A");
+            assert_eq!(organizer.data.tasks[1].description(), "C");
         }
     }
 }

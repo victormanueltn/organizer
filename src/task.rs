@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct Task {
     pub id: usize,
     task_completed: bool,
@@ -5,7 +8,7 @@ pub struct Task {
     state: State,
 }
 
-#[derive(Clone, Debug, Copy)]
+#[derive(Serialize, Deserialize, Clone, Debug, Copy)]
 pub(crate) enum State {
     Idle,
     BeingEdited,
