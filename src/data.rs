@@ -57,8 +57,10 @@ mod tests {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
         };
 
-        data.save("data.json").unwrap();
-        let loaded_data = Data::load("data.json").unwrap();
+        let file_name = "test_data.json";
+
+        data.save(file_name).unwrap();
+        let loaded_data = Data::load(file_name).unwrap();
 
         assert_eq!(data, loaded_data);
     }
@@ -72,7 +74,7 @@ mod tests {
 
     #[test]
     fn load_invalid_file() {
-        let file_name = "invalid_data.json";
+        let file_name = "test_invalid_data.json";
         std::fs::write(file_name, "{\"tasks\":[{{\"id\":0,\"task_completed\":false,\"description\":\"\",\"state\":\"Idle\"}]}").unwrap();
 
         let loaded_data = Data::load(file_name);
