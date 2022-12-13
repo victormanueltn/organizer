@@ -71,6 +71,19 @@ mod tests {
     }
 
     #[test]
+    fn load_invalid_file() {
+        let file_name = "invalid_data.json";
+        std::fs::write(file_name, "{\"tasks\":[{{\"id\":0,\"task_completed\":false,\"description\":\"\",\"state\":\"Idle\"}]}").unwrap();
+
+        let loaded_data = Data::load(file_name);
+
+        assert!(matches!(
+            loaded_data.unwrap_err().kind,
+            FileErrorKind::Serialization
+        ));
+    }
+
+    #[test]
     fn save_to_inexistent_folder() {
         let data = Data {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
