@@ -7,10 +7,10 @@ use iced::Length;
 use iced::Sandbox;
 mod task;
 use task::Task;
-mod tasktoiced;
-use tasktoiced::TaskToIced;
 mod data;
+mod tasktoiced;
 use data::Data;
+mod toiced;
 
 pub struct Organizer {
     data: Data,
@@ -38,6 +38,8 @@ impl Sandbox for Organizer {
 
     #[cfg(not(tarpaulin_include))]
     fn view(&self) -> Element<Message> {
+        use toiced::ToIced;
+
         let mut a_column = column(vec![]);
 
         for (index, task) in self.data.tasks.iter().enumerate() {

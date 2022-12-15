@@ -1,12 +1,9 @@
 use crate::task::{self, Task};
+use crate::toiced::{self, ToIced};
 use iced::alignment;
 use iced::widget::{button, checkbox, row, text_input, Button, Text};
 use iced::Element;
 use iced::Length;
-
-pub(crate) trait TaskToIced {
-    fn view(&self) -> Element<task::Message>;
-}
 
 fn add_button(text: &str, task_message: task::Message) -> Button<task::Message> {
     let text = Text::new(text)
@@ -16,7 +13,8 @@ fn add_button(text: &str, task_message: task::Message) -> Button<task::Message> 
     button(text).on_press(task_message).padding(10)
 }
 
-impl TaskToIced for Task {
+impl ToIced for Task {
+    type Message = task::Message;
     fn view(&self) -> Element<task::Message> {
         match self.state() {
             task::State::Idle => {
