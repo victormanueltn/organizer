@@ -9,22 +9,16 @@ mod task;
 use task::Task;
 mod data;
 mod tasktoiced;
-use data::Data;
+use data::{Data, Message};
 mod toiced;
 
 pub struct Organizer {
     data: Data,
 }
 
-#[derive(Debug, Clone)]
-pub enum Message {
-    AddTask,
-    TaskMessage(usize, task::Message),
-}
-
 #[cfg(not(tarpaulin_include))]
 impl Sandbox for Organizer {
-    type Message = Message;
+    type Message = data::Message;
 
     fn new() -> Self {
         Organizer {

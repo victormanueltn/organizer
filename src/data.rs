@@ -1,9 +1,16 @@
 use crate::task::Task;
+use crate::task::{self};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub(crate) struct Data {
     pub(crate) tasks: Vec<Task>,
+}
+
+#[derive(Debug, Clone)]
+pub enum Message {
+    AddTask,
+    TaskMessage(usize, task::Message),
 }
 
 #[derive(Debug)]
