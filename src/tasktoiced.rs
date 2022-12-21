@@ -1,5 +1,5 @@
 use crate::task::{self, Task};
-use crate::toiced::{self, ToIced};
+use crate::toiced::ToIced;
 use iced::alignment;
 use iced::widget::{button, checkbox, row, text_input, Button, Text};
 use iced::Element;
@@ -26,6 +26,7 @@ impl ToIced for Task {
 
                 let edit_button = add_button("Edit", task::Message::EditTask);
                 let delete_button = add_button("Delete", task::Message::DeleteTask);
+                let save_button = add_button("Delete", task::Message::DeleteTask);
 
                 let a_row = row(vec![])
                     .spacing(20)

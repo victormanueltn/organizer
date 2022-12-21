@@ -1,7 +1,5 @@
 use iced::alignment;
-use iced::widget::container;
 use iced::widget::Column;
-use iced::widget::{button, column, Text};
 use iced::Element;
 use iced::Length;
 use iced::Sandbox;
@@ -10,7 +8,9 @@ use task::Task;
 mod data;
 mod tasktoiced;
 use data::{Data, Message};
+mod datatoiced;
 mod toiced;
+use toiced::ToIced;
 
 pub struct Organizer {
     data: Data,
@@ -32,22 +32,7 @@ impl Sandbox for Organizer {
 
     #[cfg(not(tarpaulin_include))]
     fn view(&self) -> Element<Message> {
-        use toiced::ToIced;
-
-        let mut a_column = column(vec![]);
-
-        for (index, task) in self.data.tasks.iter().enumerate() {
-            a_column = a_column.push(
-                task.view()
-                    .map(move |message| Message::TaskMessage(index, message)),
-            );
-        }
-
-        a_column = Organizer::add_task_button(a_column)
-            .spacing(10)
-            .align_items(iced::Alignment::Start);
-
-        container(a_column).width(Length::Fill).center_x().into()
+        self.data.view()
     }
 
     fn update(&mut self, message: Message) {
@@ -84,6 +69,8 @@ impl Organizer {
 
     #[cfg(not(tarpaulin_include))]
     pub fn add_task_button(a_column: Column<Message>) -> Column<Message> {
+        use iced::widget::{button, Text};
+
         let create_task_text = Text::new("Add a new task")
             .width(Length::Units(120))
             .horizontal_alignment(alignment::Horizontal::Center)
