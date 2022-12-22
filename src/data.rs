@@ -10,17 +10,19 @@ pub(crate) struct Data {
 #[derive(Debug, Clone)]
 pub enum Message {
     AddTask,
-    TaskMessage(usize, task::Message),
+    Task(usize, task::Message),
+    Load,
+    Save,
 }
 
 #[derive(Debug)]
-pub(crate) struct FileError {
-    message: String,
-    kind: FileErrorKind,
+pub struct FileError {
+    pub message: String,
+    pub kind: FileErrorKind,
 }
 
 #[derive(Debug)]
-enum FileErrorKind {
+pub enum FileErrorKind {
     Load,
     Serialization,
     Write,
@@ -36,7 +38,7 @@ impl From<serde_json::Error> for FileError {
 }
 
 impl Data {
-    fn save(&self, file_name: &str) -> Result<(), FileError> {
+    pub(crate) fn save(&self, file_name: &str) -> Result<(), FileError> {
         let serialized_data = serde_json::to_string(&self).unwrap();
 
         std::fs::write(file_name, serialized_data).map_err(|_| FileError {
@@ -44,7 +46,7 @@ impl Data {
             kind: FileErrorKind::Write,
         })
     }
-    fn load(file_name: &str) -> Result<Data, FileError> {
+    pub(crate) fn load(file_name: &str) -> Result<Data, FileError> {
         let serialized_data = std::fs::read_to_string(file_name).map_err(|_| FileError {
             message: "Problem loading file".to_string(),
             kind: FileErrorKind::Load,

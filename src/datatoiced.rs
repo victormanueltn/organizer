@@ -1,6 +1,6 @@
 use crate::{
     data::{Data, Message},
-    toiced::ToIced,
+    toiced::{add_button, ToIced},
 };
 use iced::alignment;
 use iced::{
@@ -13,10 +13,14 @@ impl ToIced for Data {
     fn view(&self) -> Element<Self::Message> {
         let mut a_column = column(vec![]);
 
+        let save_button = add_button("Save", Message::Save);
+        let load_button = add_button("Load", Message::Load);
+        a_column = a_column.push(save_button).push(load_button);
+
         for (index, task) in self.tasks.iter().enumerate() {
             a_column = a_column.push(
                 task.view()
-                    .map(move |message| Message::TaskMessage(index, message)),
+                    .map(move |message| Message::Task(index, message)),
             );
         }
 
@@ -28,7 +32,7 @@ impl ToIced for Data {
     }
 }
 
-pub fn add_task_button(a_column: Column<Message>) -> Column<Message> {
+fn add_task_button(a_column: Column<Message>) -> Column<Message> {
     let create_task_text = Text::new("Add a new task")
         .width(Length::Units(120))
         .horizontal_alignment(alignment::Horizontal::Center)

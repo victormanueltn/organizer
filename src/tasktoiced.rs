@@ -1,17 +1,7 @@
 use crate::task::{self, Task};
-use crate::toiced::ToIced;
-use iced::alignment;
-use iced::widget::{button, checkbox, row, text_input, Button, Text};
+use crate::toiced::{add_button, ToIced};
+use iced::widget::{checkbox, row, text_input};
 use iced::Element;
-use iced::Length;
-
-fn add_button(text: &str, task_message: task::Message) -> Button<task::Message> {
-    let text = Text::new(text)
-        .width(Length::Units(60))
-        .horizontal_alignment(alignment::Horizontal::Center)
-        .size(20);
-    button(text).on_press(task_message).padding(10)
-}
 
 impl ToIced for Task {
     type Message = task::Message;
@@ -26,7 +16,6 @@ impl ToIced for Task {
 
                 let edit_button = add_button("Edit", task::Message::EditTask);
                 let delete_button = add_button("Delete", task::Message::DeleteTask);
-                let save_button = add_button("Delete", task::Message::DeleteTask);
 
                 let a_row = row(vec![])
                     .spacing(20)

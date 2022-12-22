@@ -1,15 +1,12 @@
-use iced::alignment;
-use iced::widget::Column;
-use iced::Element;
-use iced::Length;
-use iced::Sandbox;
-mod task;
-use task::Task;
 mod data;
+mod task;
 mod tasktoiced;
 use data::{Data, Message};
 mod datatoiced;
 mod toiced;
+use iced::Element;
+use iced::Sandbox;
+use task::Task;
 use toiced::ToIced;
 
 pub struct Organizer {
@@ -38,11 +35,19 @@ impl Sandbox for Organizer {
     fn update(&mut self, message: Message) {
         match message {
             Message::AddTask => self.add_task(),
-            Message::TaskMessage(task_id, task_message) => {
+            Message::Task(task_id, task_message) => {
                 if task_id > self.data.tasks.len() {
                     panic!("Tried to update inexisting task.")
                 };
                 self.process_task_message(task_id, task_message)
+            }
+            Message::Save => self.data.save("test").unwrap(),
+            Message::Load => {
+                let loaded_data = Data::load("test");
+                match loaded_data {
+                    Ok(loaded_data) => self.data = loaded_data,
+                    Err(error) => panic!("Problem type {0:?}: {1:?}", error.kind, error.message),
+                }
             }
         }
     }
@@ -65,24 +70,6 @@ impl Organizer {
                 }
             }
         }
-    }
-
-    #[cfg(not(tarpaulin_include))]
-    pub fn add_task_button(a_column: Column<Message>) -> Column<Message> {
-        use iced::widget::{button, Text};
-
-        let create_task_text = Text::new("Add a new task")
-            .width(Length::Units(120))
-            .horizontal_alignment(alignment::Horizontal::Center)
-            .size(20);
-        let edit_button = button(create_task_text)
-            .on_press(Message::AddTask)
-            .padding(10);
-
-        a_column
-            .spacing(20)
-            .align_items(iced::Alignment::Center)
-            .push(edit_button)
     }
 }
 
@@ -223,7 +210,7 @@ mod tests {
             let mut organizer = Organizer::new();
             organizer.update(Message::AddTask);
 
-            organizer.update(Message::TaskMessage(1, task::Message::DeleteTask));
+            organizer.update(Message::Task(1, task::Message::DeleteTask));
             assert_eq!(organizer.data.tasks.len(), 2);
         }
 
@@ -236,36 +223,27 @@ mod tests {
             organizer.update(Message::AddTask);
             assert_eq!(organizer.data.tasks.len(), 3);
 
-            organizer.update(Message::TaskMessage(0, task::Message::EditTask));
-            organizer.update(Message::TaskMessage(1, task::Message::EditTask));
-            organizer.update(Message::TaskMessage(2, task::Message::EditTask));
+            organizer.update(Message::Task(0, task::Message::EditTask));
+            organizer.update(Message::Task(1, task::Message::EditTask));
+            organizer.update(Message::Task(2, task::Message::EditTask));
 
             organizer.data.tasks.iter().for_each(|task| {
                 assert!(matches!(task.state(), task::State::BeingEdited));
             });
 
-            organizer.update(Message::TaskMessage(
-                0,
-                task::Message::TextInput("A".to_string()),
-            ));
-            organizer.update(Message::TaskMessage(
-                1,
-                task::Message::TextInput("B".to_string()),
-            ));
-            organizer.update(Message::TaskMessage(
-                2,
-                task::Message::TextInput("C".to_string()),
-            ));
+            organizer.update(Message::Task(0, task::Message::TextInput("A".to_string())));
+            organizer.update(Message::Task(1, task::Message::TextInput("B".to_string())));
+            organizer.update(Message::Task(2, task::Message::TextInput("C".to_string())));
 
-            organizer.update(Message::TaskMessage(0, task::Message::FinishedEdition));
-            organizer.update(Message::TaskMessage(1, task::Message::FinishedEdition));
-            organizer.update(Message::TaskMessage(2, task::Message::FinishedEdition));
+            organizer.update(Message::Task(0, task::Message::FinishedEdition));
+            organizer.update(Message::Task(1, task::Message::FinishedEdition));
+            organizer.update(Message::Task(2, task::Message::FinishedEdition));
 
             organizer.data.tasks.iter().for_each(|task| {
                 assert!(matches!(task.state(), task::State::Idle));
             });
 
-            organizer.update(Message::TaskMessage(1, task::Message::DeleteTask));
+            organizer.update(Message::Task(1, task::Message::DeleteTask));
             assert_eq!(organizer.data.tasks.len(), 2);
 
             assert_eq!(organizer.data.tasks[0].description(), "A");
