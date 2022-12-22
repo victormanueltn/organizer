@@ -4,6 +4,7 @@ mod tasktoiced;
 use data::{Data, Message};
 mod datatoiced;
 mod toiced;
+use iced::widget::column;
 use iced::Element;
 use iced::Sandbox;
 use task::Task;
@@ -11,6 +12,7 @@ use toiced::ToIced;
 
 pub struct Organizer {
     data: Data,
+    error_text: Option<String>,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -20,6 +22,7 @@ impl Sandbox for Organizer {
     fn new() -> Self {
         Organizer {
             data: Data { tasks: vec![] },
+            error_text: None,
         }
     }
 
@@ -29,10 +32,18 @@ impl Sandbox for Organizer {
 
     #[cfg(not(tarpaulin_include))]
     fn view(&self) -> Element<Message> {
-        self.data.view()
+        use iced::widget::Text;
+
+        let data_view = self.data.view();
+        let mut a_column = column(vec![]);
+        if let Some(ref error_text) = self.error_text {
+            a_column = a_column.push(Text::new(error_text));
+        }
+        a_column.push(data_view).into()
     }
 
     fn update(&mut self, message: Message) {
+        self.error_text = None;
         match message {
             Message::AddTask => self.add_task(),
             Message::Task(task_id, task_message) => {
@@ -41,12 +52,21 @@ impl Sandbox for Organizer {
                 };
                 self.process_task_message(task_id, task_message)
             }
-            Message::Save => self.data.save("test").unwrap(),
+            Message::Save => {
+                let save_result = self.data.save("test");
+                if let Err(error) = save_result {
+                    self.error_text =
+                        Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
+                }
+            }
             Message::Load => {
                 let loaded_data = Data::load("test");
                 match loaded_data {
                     Ok(loaded_data) => self.data = loaded_data,
-                    Err(error) => panic!("Problem type {0:?}: {1:?}", error.kind, error.message),
+                    Err(error) => {
+                        self.error_text =
+                            Some(format!("{0:?} problem: {1:?}", error.kind, error.message))
+                    }
                 }
             }
         }
