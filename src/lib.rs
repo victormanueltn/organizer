@@ -32,12 +32,14 @@ impl Sandbox for Organizer {
 
     #[cfg(not(tarpaulin_include))]
     fn view(&self) -> Element<Message> {
-        use iced::widget::Text;
+        use iced::{widget::Text, Alignment};
 
         let data_view = self.data.view();
         let mut a_column = column(vec![]);
         if let Some(ref error_text) = self.error_text {
-            a_column = a_column.push(Text::new(error_text));
+            a_column = a_column
+                .push(Text::new(error_text))
+                .align_items(Alignment::Center);
         }
         a_column.push(data_view).into()
     }
