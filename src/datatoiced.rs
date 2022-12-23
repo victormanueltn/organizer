@@ -1,9 +1,9 @@
 use crate::{
     data::{Data, Message},
-    toiced::{add_button, ToIced},
+    toiced::ToIced,
 };
-use iced::alignment;
 use iced::{
+    alignment,
     widget::{button, column, container, Column, Text},
     Element, Length,
 };
@@ -12,10 +12,6 @@ impl ToIced for Data {
     type Message = Message;
     fn view(&self) -> Element<Self::Message> {
         let mut a_column = column(vec![]);
-
-        let save_button = add_button("Save", Message::Save);
-        let load_button = add_button("Load", Message::Load);
-        a_column = a_column.push(save_button).push(load_button);
 
         for (index, task) in self.tasks.iter().enumerate() {
             a_column = a_column.push(

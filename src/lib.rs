@@ -4,15 +4,19 @@ mod tasktoiced;
 use data::{Data, Message};
 mod datatoiced;
 mod toiced;
+use crate::toiced::add_button;
 use iced::widget::column;
+use iced::widget::text_input;
 use iced::Element;
 use iced::Sandbox;
+use iced::{widget::Text, Alignment};
 use task::Task;
 use toiced::ToIced;
 
 pub struct Organizer {
     data: Data,
     error_text: Option<String>,
+    file_name: String,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -23,6 +27,7 @@ impl Sandbox for Organizer {
         Organizer {
             data: Data { tasks: vec![] },
             error_text: None,
+            file_name: String::new(),
         }
     }
 
@@ -32,7 +37,7 @@ impl Sandbox for Organizer {
 
     #[cfg(not(tarpaulin_include))]
     fn view(&self) -> Element<Message> {
-        use iced::{widget::Text, Alignment};
+        use iced::widget::row;
 
         let data_view = self.data.view();
         let mut a_column = column(vec![]);
@@ -41,7 +46,16 @@ impl Sandbox for Organizer {
                 .push(Text::new(error_text))
                 .align_items(Alignment::Center);
         }
-        a_column.push(data_view).into()
+
+        let file_name_input =
+            text_input("File name.", &self.file_name, Message::UpdateSaveFileName).padding(10);
+        let load_button = add_button("Save", Message::Save);
+        let save_button = add_button("Load", Message::Load);
+        let a_row = row!(file_name_input, save_button, load_button)
+            .spacing(10)
+            .padding(10);
+
+        a_column.push(data_view).push(a_row).spacing(10).into()
     }
 
     fn update(&mut self, message: Message) {
@@ -54,21 +68,24 @@ impl Sandbox for Organizer {
                 };
                 self.process_task_message(task_id, task_message)
             }
-            Message::Save => {
-                let save_result = self.data.save("test");
-                if let Err(error) = save_result {
-                    self.error_text =
-                        Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
-                }
+            Message::UpdateSaveFileName(file_name) => {
+                self.file_name = file_name;
             }
             Message::Load => {
-                let loaded_data = Data::load("test");
+                let loaded_data = Data::load(&self.file_name);
                 match loaded_data {
                     Ok(loaded_data) => self.data = loaded_data,
                     Err(error) => {
                         self.error_text =
                             Some(format!("{0:?} problem: {1:?}", error.kind, error.message))
                     }
+                }
+            }
+            Message::Save => {
+                let save_result = self.data.save(&self.file_name);
+                if let Err(error) = save_result {
+                    self.error_text =
+                        Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
                 }
             }
         }

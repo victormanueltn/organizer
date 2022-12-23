@@ -12,6 +12,7 @@ pub enum Message {
     AddTask,
     Task(usize, task::Message),
     Load,
+    UpdateSaveFileName(String),
     Save,
 }
 
