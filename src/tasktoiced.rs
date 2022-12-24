@@ -37,6 +37,7 @@ impl ToIced for Task {
 
                 let a_row = row(vec![])
                     .spacing(20)
+                    .padding(10)
                     .align_items(iced::Alignment::Center)
                     .push(a_text_input);
 

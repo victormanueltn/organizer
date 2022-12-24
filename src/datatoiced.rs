@@ -22,7 +22,7 @@ impl ToIced for Data {
 
         a_column = add_task_button(a_column)
             .spacing(10)
-            .align_items(iced::Alignment::Start);
+            .align_items(iced::Alignment::Center);
 
         container(a_column).width(Length::Fill).center_x().into()
     }
