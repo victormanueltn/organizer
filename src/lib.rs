@@ -47,15 +47,19 @@ impl Sandbox for Organizer {
                 .align_items(Alignment::Center);
         }
 
-        let file_name_input =
-            text_input("File name.", &self.file_name, Message::UpdateSaveFileName).padding(10);
-        let load_button = add_button("Save", Message::Save);
-        let save_button = add_button("Load", Message::Load);
+        let file_name_input = text_input(
+            "Name of the task list",
+            &self.file_name,
+            Message::UpdateSaveFileName,
+        )
+        .padding(10);
+        let load_button = add_button("Save task list", Message::Save);
+        let save_button = add_button("Load task list", Message::Load);
         let a_row = row!(file_name_input, save_button, load_button)
             .spacing(10)
             .padding(10);
 
-        a_column.push(data_view).push(a_row).spacing(10).into()
+        a_column.push(a_row).push(data_view).spacing(10).into()
     }
 
     fn update(&mut self, message: Message) {

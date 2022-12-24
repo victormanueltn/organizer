@@ -15,7 +15,8 @@ impl ToIced for Task {
                 );
 
                 let edit_button = add_button("Edit", task::Message::EditTask);
-                let delete_button = add_button("Delete", task::Message::DeleteTask);
+                let delete_button = add_button("Delete", task::Message::DeleteTask)
+                    .style(iced::theme::Button::Destructive);
 
                 let a_row = row(vec![])
                     .spacing(20)
