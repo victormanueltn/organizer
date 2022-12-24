@@ -43,7 +43,7 @@ impl Sandbox for Organizer {
         let mut a_column = column(vec![]);
         if let Some(ref error_text) = self.error_text {
             a_column = a_column
-                .push(Text::new(error_text))
+                .push(Text::new(error_text).style(iced::Color::from_rgb(1., 0., 0.)))
                 .align_items(Alignment::Center);
         }
 
