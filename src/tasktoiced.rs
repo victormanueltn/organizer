@@ -6,44 +6,30 @@ use iced::Element;
 impl ToIced for Task {
     type Message = task::Message;
     fn view(&self) -> Element<task::Message> {
-        match self.state() {
-            task::State::Idle => {
-                let checkbox_instance = checkbox(
-                    self.description().to_string(),
-                    self.completed(),
-                    task::Message::ToggleTaskCompletion,
-                );
+        let checkbox_instance = checkbox(
+            "".to_string(),
+            self.completed(),
+            task::Message::ToggleTaskCompletion,
+        );
 
-                let edit_button = add_button("Edit", task::Message::EditTask);
-                let delete_button = add_button("Delete", task::Message::DeleteTask)
-                    .style(iced::theme::Button::Destructive);
+        let a_text_input = text_input(
+            "Describe your task...",
+            self.description(),
+            task::Message::TextInput,
+        )
+        .padding(10);
 
-                let a_row = row(vec![])
-                    .spacing(20)
-                    .align_items(iced::Alignment::Center)
-                    .push(checkbox_instance)
-                    .push(edit_button)
-                    .push(delete_button);
+        let delete_button =
+            add_button("Delete", task::Message::DeleteTask).style(iced::theme::Button::Destructive);
 
-                a_row.into()
-            }
-            task::State::BeingEdited => {
-                let a_text_input = text_input(
-                    "Describe your task...",
-                    self.description(),
-                    task::Message::TextInput,
-                )
-                .padding(10)
-                .on_submit(task::Message::FinishedEdition);
+        let a_row = row(vec![])
+            .spacing(10)
+            .padding(10)
+            .align_items(iced::Alignment::Center)
+            .push(checkbox_instance)
+            .push(a_text_input)
+            .push(delete_button);
 
-                let a_row = row(vec![])
-                    .spacing(20)
-                    .padding(10)
-                    .align_items(iced::Alignment::Center)
-                    .push(a_text_input);
-
-                a_row.into()
-            }
-        }
+        a_row.into()
     }
 }

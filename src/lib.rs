@@ -105,9 +105,7 @@ impl Organizer {
         if let Some(a_task) = self.data.tasks.get_mut(task_id) {
             match task_message {
                 task::Message::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
-                task::Message::EditTask => a_task.set_state(task::State::BeingEdited),
                 task::Message::TextInput(description) => a_task.edit(&description),
-                task::Message::FinishedEdition => a_task.set_state(task::State::Idle),
                 task::Message::DeleteTask => {
                     self.data.tasks.remove(task_id);
                 }
@@ -179,13 +177,11 @@ mod tests {
 
             {
                 let task = organizer.data.tasks.get(0).unwrap();
-                assert!(matches!(task.state(), task::State::Idle));
             }
 
             organizer.process_task_message(0, task::Message::EditTask);
             {
                 let task = organizer.data.tasks.get(0).unwrap();
-                assert!(matches!(task.state(), task::State::BeingEdited));
             }
         }
 
@@ -215,7 +211,6 @@ mod tests {
             organizer.process_task_message(0, task::Message::FinishedEdition);
             {
                 let task = organizer.data.tasks.get(0).unwrap();
-                assert!(matches!(task.state(), task::State::Idle));
             }
         }
 
@@ -270,10 +265,6 @@ mod tests {
             organizer.update(Message::Task(1, task::Message::EditTask));
             organizer.update(Message::Task(2, task::Message::EditTask));
 
-            organizer.data.tasks.iter().for_each(|task| {
-                assert!(matches!(task.state(), task::State::BeingEdited));
-            });
-
             organizer.update(Message::Task(0, task::Message::TextInput("A".to_string())));
             organizer.update(Message::Task(1, task::Message::TextInput("B".to_string())));
             organizer.update(Message::Task(2, task::Message::TextInput("C".to_string())));
@@ -281,10 +272,6 @@ mod tests {
             organizer.update(Message::Task(0, task::Message::FinishedEdition));
             organizer.update(Message::Task(1, task::Message::FinishedEdition));
             organizer.update(Message::Task(2, task::Message::FinishedEdition));
-
-            organizer.data.tasks.iter().for_each(|task| {
-                assert!(matches!(task.state(), task::State::Idle));
-            });
 
             organizer.update(Message::Task(1, task::Message::DeleteTask));
             assert_eq!(organizer.data.tasks.len(), 2);
