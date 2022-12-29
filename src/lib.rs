@@ -171,21 +171,6 @@ mod tests {
         }
 
         #[test]
-        fn edit_task() {
-            let mut organizer = Organizer::new();
-            organizer.add_task();
-
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
-            }
-
-            organizer.process_task_message(0, task::Message::EditTask);
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
-            }
-        }
-
-        #[test]
         fn text_input() {
             let mut organizer = Organizer::new();
             organizer.add_task();
@@ -200,17 +185,6 @@ mod tests {
             {
                 let task = organizer.data.tasks.get(0).unwrap();
                 assert_eq!(task.description(), "A description");
-            }
-        }
-
-        #[test]
-        fn finished_edition() {
-            let mut organizer = Organizer::new();
-            organizer.add_task();
-            organizer.process_task_message(0, task::Message::EditTask);
-            organizer.process_task_message(0, task::Message::FinishedEdition);
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
             }
         }
 
@@ -261,17 +235,9 @@ mod tests {
             organizer.update(Message::AddTask);
             assert_eq!(organizer.data.tasks.len(), 3);
 
-            organizer.update(Message::Task(0, task::Message::EditTask));
-            organizer.update(Message::Task(1, task::Message::EditTask));
-            organizer.update(Message::Task(2, task::Message::EditTask));
-
             organizer.update(Message::Task(0, task::Message::TextInput("A".to_string())));
             organizer.update(Message::Task(1, task::Message::TextInput("B".to_string())));
             organizer.update(Message::Task(2, task::Message::TextInput("C".to_string())));
-
-            organizer.update(Message::Task(0, task::Message::FinishedEdition));
-            organizer.update(Message::Task(1, task::Message::FinishedEdition));
-            organizer.update(Message::Task(2, task::Message::FinishedEdition));
 
             organizer.update(Message::Task(1, task::Message::DeleteTask));
             assert_eq!(organizer.data.tasks.len(), 2);
