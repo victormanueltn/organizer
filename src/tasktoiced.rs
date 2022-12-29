@@ -6,7 +6,7 @@ use iced::Element;
 impl ToIced for Task {
     type Message = task::Message;
     fn view(&self) -> Element<task::Message> {
-        let checkbox_instance = checkbox(
+        let a_checkbox = checkbox(
             "".to_string(),
             self.completed(),
             task::Message::ToggleTaskCompletion,
@@ -26,7 +26,7 @@ impl ToIced for Task {
             .spacing(10)
             .padding(10)
             .align_items(iced::Alignment::Center)
-            .push(checkbox_instance)
+            .push(a_checkbox)
             .push(a_text_input)
             .push(delete_button);
 
