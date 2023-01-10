@@ -17,6 +17,12 @@ pub struct Organizer {
     data: Data,
     error_text: Option<String>,
     file_name: String,
+    filters: Filters,
+}
+
+struct Filters {
+    complete: bool,
+    active: bool,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -28,6 +34,10 @@ impl Sandbox for Organizer {
             data: Data { tasks: vec![] },
             error_text: None,
             file_name: String::new(),
+            filters: Filters {
+                complete: true,
+                active: true,
+            },
         }
     }
 
@@ -39,8 +49,20 @@ impl Sandbox for Organizer {
     fn view(&self) -> Element<Message> {
         use iced::widget::row;
 
+        let a_text = Text::new("Show");
+
+        let button_active_tasks =
+            iced::widget::Checkbox::new(self.filters.active, "Active", Message::ToggleActiveFilter);
+        let button_complete_tasks = iced::widget::Checkbox::new(
+            self.filters.complete,
+            "Complete",
+            Message::ToggleCompleteFilter,
+        );
+
+        let a_row = row![a_text, button_active_tasks, button_complete_tasks].spacing(50);
+
         let data_view = self.data.view();
-        let mut a_column = column(vec![]);
+        let mut a_column = column(vec![a_row.into()]).align_items(Alignment::Center);
         if let Some(ref error_text) = self.error_text {
             a_column = a_column
                 .push(Text::new(error_text).style(iced::Color::from_rgb(1., 0., 0.)))
@@ -91,6 +113,12 @@ impl Sandbox for Organizer {
                     self.error_text =
                         Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
                 }
+            }
+            Message::ToggleActiveFilter(value) => {
+                self.filters.active = value;
+            }
+            Message::ToggleCompleteFilter(value) => {
+                self.filters.complete = value;
             }
         }
     }

@@ -14,6 +14,8 @@ pub enum Message {
     Load,
     UpdateSaveFileName(String),
     Save,
+    ToggleActiveFilter(bool),
+    ToggleCompleteFilter(bool),
 }
 
 #[derive(Debug)]
