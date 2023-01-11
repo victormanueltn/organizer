@@ -14,10 +14,14 @@ impl ToIced for Data {
         let mut a_column = column(vec![]);
 
         for (index, task) in self.tasks.iter().enumerate() {
-            a_column = a_column.push(
-                task.view()
-                    .map(move |message| Message::Task(index, message)),
-            );
+            let completed = task.completed();
+            let active = !completed;
+            if completed && self.filters.complete || active && self.filters.active {
+                a_column = a_column.push(
+                    task.view()
+                        .map(move |message| Message::Task(index, message)),
+                );
+            }
         }
 
         a_column = add_task_button(a_column)

@@ -1,7 +1,7 @@
 mod data;
 mod task;
 mod tasktoiced;
-use data::{Data, Message};
+use data::{Data, Filters, Message};
 mod datatoiced;
 mod toiced;
 use crate::toiced::add_button;
@@ -17,12 +17,6 @@ pub struct Organizer {
     data: Data,
     error_text: Option<String>,
     file_name: String,
-    filters: Filters,
-}
-
-struct Filters {
-    complete: bool,
-    active: bool,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -31,13 +25,15 @@ impl Sandbox for Organizer {
 
     fn new() -> Self {
         Organizer {
-            data: Data { tasks: vec![] },
+            data: Data {
+                tasks: vec![],
+                filters: Filters {
+                    complete: true,
+                    active: true,
+                },
+            },
             error_text: None,
             file_name: String::new(),
-            filters: Filters {
-                complete: true,
-                active: true,
-            },
         }
     }
 
@@ -51,10 +47,13 @@ impl Sandbox for Organizer {
 
         let a_text = Text::new("Show");
 
-        let button_active_tasks =
-            iced::widget::Checkbox::new(self.filters.active, "Active", Message::ToggleActiveFilter);
+        let button_active_tasks = iced::widget::Checkbox::new(
+            self.data.filters.active,
+            "Active",
+            Message::ToggleActiveFilter,
+        );
         let button_complete_tasks = iced::widget::Checkbox::new(
-            self.filters.complete,
+            self.data.filters.complete,
             "Complete",
             Message::ToggleCompleteFilter,
         );
@@ -115,10 +114,10 @@ impl Sandbox for Organizer {
                 }
             }
             Message::ToggleActiveFilter(value) => {
-                self.filters.active = value;
+                self.data.filters.active = value;
             }
             Message::ToggleCompleteFilter(value) => {
-                self.filters.complete = value;
+                self.data.filters.complete = value;
             }
         }
     }

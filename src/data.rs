@@ -5,6 +5,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub(crate) struct Data {
     pub(crate) tasks: Vec<Task>,
+    pub(crate) filters: Filters,
+}
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+pub(crate) struct Filters {
+    pub complete: bool,
+    pub active: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -67,6 +73,10 @@ mod tests {
     fn save_and_load_returns_same_data() {
         let data = Data {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
+            filters: Filters {
+                active: true,
+                complete: true,
+            },
         };
 
         let file_name = "test_data.json";
@@ -101,6 +111,10 @@ mod tests {
     fn save_to_inexistent_folder() {
         let data = Data {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
+            filters: Filters {
+                active: true,
+                complete: true,
+            },
         };
 
         let save_result = data.save("./inexistent_directory/data.json");
