@@ -13,15 +13,22 @@ impl ToIced for Data {
     fn view(&self) -> Element<Self::Message> {
         let mut a_column = column(vec![]);
 
-        for (index, task) in self.tasks.iter().enumerate() {
-            let completed = task.completed();
-            let active = !completed;
-            if completed && self.filters.complete || active && self.filters.active {
-                a_column = a_column.push(
-                    task.view()
-                        .map(move |message| Message::Task(index, message)),
-                );
-            }
+        let messages: Vec<_> = self
+            .tasks
+            .iter()
+            .enumerate()
+            .filter(|(_, task)| {
+                (task.completed() && self.filters.complete)
+                    || (!task.completed() && self.filters.active)
+            })
+            .map(|(index, task)| {
+                task.view()
+                    .map(move |message| Message::Task(index, message))
+            })
+            .collect();
+
+        for message in messages {
+            a_column = a_column.push(message);
         }
 
         a_column = add_task_button(a_column)
