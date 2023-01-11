@@ -19,7 +19,7 @@ impl ToIced for Data {
             .enumerate()
             .filter(|(_, task)| {
                 (task.completed() && self.filters.complete)
-                    || (!task.completed() && self.filters.active)
+                    || (!task.completed() && self.filters.todo)
             })
             .map(|(index, task)| {
                 task.view()

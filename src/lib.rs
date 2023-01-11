@@ -29,7 +29,7 @@ impl Sandbox for Organizer {
                 tasks: vec![],
                 filters: Filters {
                     complete: true,
-                    active: true,
+                    todo: true,
                 },
             },
             error_text: None,
@@ -47,9 +47,9 @@ impl Sandbox for Organizer {
 
         let a_text = Text::new("Show");
 
-        let button_active_tasks = iced::widget::Checkbox::new(
-            self.data.filters.active,
-            "Active",
+        let button_todo_tasks = iced::widget::Checkbox::new(
+            self.data.filters.todo,
+            "Todo",
             Message::ToggleActiveFilter,
         );
         let button_complete_tasks = iced::widget::Checkbox::new(
@@ -58,7 +58,7 @@ impl Sandbox for Organizer {
             Message::ToggleCompleteFilter,
         );
 
-        let a_row = row![a_text, button_active_tasks, button_complete_tasks].spacing(50);
+        let a_row = row![a_text, button_todo_tasks, button_complete_tasks].spacing(50);
 
         let data_view = self.data.view();
         let mut a_column = column(vec![a_row.into()]).align_items(Alignment::Center);
@@ -114,7 +114,7 @@ impl Sandbox for Organizer {
                 }
             }
             Message::ToggleActiveFilter(value) => {
-                self.data.filters.active = value;
+                self.data.filters.todo = value;
             }
             Message::ToggleCompleteFilter(value) => {
                 self.data.filters.complete = value;

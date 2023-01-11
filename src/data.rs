@@ -10,7 +10,7 @@ pub(crate) struct Data {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub(crate) struct Filters {
     pub complete: bool,
-    pub active: bool,
+    pub todo: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -74,7 +74,7 @@ mod tests {
         let data = Data {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
             filters: Filters {
-                active: true,
+                todo: true,
                 complete: true,
             },
         };
@@ -112,7 +112,7 @@ mod tests {
         let data = Data {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
             filters: Filters {
-                active: true,
+                todo: true,
                 complete: true,
             },
         };
