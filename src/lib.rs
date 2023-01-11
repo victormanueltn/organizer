@@ -45,8 +45,6 @@ impl Sandbox for Organizer {
     fn view(&self) -> Element<Message> {
         use iced::widget::row;
 
-        let a_text = Text::new("Show");
-
         let button_todo_tasks = iced::widget::Checkbox::new(
             self.data.filters.todo,
             "Todo",
@@ -58,7 +56,7 @@ impl Sandbox for Organizer {
             Message::ToggleCompleteFilter,
         );
 
-        let a_row = row![a_text, button_todo_tasks, button_complete_tasks].spacing(50);
+        let a_row = row![button_todo_tasks, button_complete_tasks].spacing(40);
 
         let data_view = self.data.view();
         let mut a_column = column(vec![a_row.into()]).align_items(Alignment::Center);
