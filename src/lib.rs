@@ -3,6 +3,7 @@ mod task;
 mod tasktoiced;
 use data::{Data, Filters, Message};
 mod datatoiced;
+mod time;
 mod toiced;
 use crate::toiced::add_button;
 use iced::widget::column;
