@@ -45,21 +45,10 @@ mod tests {
         assert_eq!(time.to_string(), time_string);
     }
 
-    //    #[test]
-    //    fn comparison_chrono() {
-    //        let before = DateTime::parse_from_rfc2822("Sat, 21 Jan 2023 12:25:20 +0100").unwrap();
-    //        let now = chrono::Local::now();
-    //        if now > before {
-    //            println!("Yay!");
-    //        }
-    //    }
-
     #[test]
     fn comparison() {
         let before = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
         let after = Time::new("Sat, 21 Jan 2023 12:25:21 +0100");
-        if after > before {
-            println!("Yay!");
-        }
+        assert!(after > before);
     }
 }
