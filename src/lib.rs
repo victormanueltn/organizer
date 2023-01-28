@@ -47,13 +47,13 @@ impl Sandbox for Organizer {
         use iced::widget::row;
 
         let button_todo_tasks = iced::widget::Checkbox::new(
-            self.data.filters.todo,
             "Todo",
+            self.data.filters.todo,
             Message::ToggleActiveFilter,
         );
         let button_complete_tasks = iced::widget::Checkbox::new(
-            self.data.filters.complete,
             "Complete",
+            self.data.filters.complete,
             Message::ToggleCompleteFilter,
         );
 
