@@ -1,7 +1,7 @@
 use std::fmt;
 
-use chrono::{DateTime, FixedOffset, Local};
-use serde::{de::Visitor, ser::SerializeStruct, Deserialize, Serialize};
+use chrono::{DateTime, FixedOffset};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, PartialOrd)]
 pub(crate) struct Time {
