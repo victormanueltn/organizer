@@ -33,6 +33,7 @@ impl Task {
     }
 
     pub fn set_completed(&mut self, completed: bool) {
+        self.completion_time = Some(Time::now());
         self.task_completed = completed;
     }
 
@@ -108,5 +109,14 @@ mod tests {
 
         task.set_completed(false);
         assert!(!task.completed());
+    }
+
+    #[test]
+    fn set_completion_time() {
+        let mut task = Task::new(1);
+        assert!(task.completion_time.is_none());
+
+        task.set_completed(true);
+        assert!(task.completion_time.is_some());
     }
 }
