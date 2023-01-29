@@ -1,15 +1,15 @@
 use std::fmt;
 
-use chrono::{DateTime, Local};
-use serde::{ser::SerializeStruct, Serialize};
+use chrono::{DateTime, FixedOffset, Local};
+use serde::{de::Visitor, ser::SerializeStruct, Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, PartialOrd)]
-struct Time {
-    time: DateTime<Local>,
+pub(crate) struct Time {
+    time: DateTime<FixedOffset>,
 }
 
 #[derive(Debug, PartialEq)]
-struct Duration(chrono::Duration);
+pub(crate) struct Duration(chrono::Duration);
 
 impl Duration {
     fn new(minutes: i64) -> Self {
@@ -26,7 +26,16 @@ impl fmt::Display for Time {
 impl Time {
     fn new(time: &str) -> Time {
         Time {
-            time: DateTime::parse_from_rfc2822(time).unwrap().into(),
+            time: DateTime::parse_from_rfc2822(time).unwrap(),
+        }
+    }
+
+    pub(crate) fn now() -> Time {
+        Time {
+            time: {
+                let now = chrono::Local::now();
+                DateTime::parse_from_rfc2822(&now.to_rfc2822()).unwrap()
+            },
         }
     }
 }
@@ -53,17 +62,27 @@ impl Serialize for Time {
     where
         S: serde::Serializer,
     {
-        let lenth = 1;
-        let mut serialized = serializer.serialize_struct("CreationTime", lenth)?;
-        serialized.serialize_field("Time", &self.to_string())?;
-        serialized.end()
+        serializer.serialize_str(&self.time.to_rfc2822())
+    }
+}
+
+impl<'de> Deserialize<'de> for Time {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let description = String::deserialize(deserializer)?;
+        //        match chrono::DateTime::parse_from_rfc2822(&description) {
+        match chrono::DateTime::parse_from_rfc2822(&description) {
+            //            Ok(date) => Ok(Time::new(&date.to_rfc2822())),
+            Ok(date) => Ok(Time::new(&date.to_rfc2822())),
+            Err(message) => Err(serde::de::Error::custom(message)),
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use float_cmp::ApproxEq;
-
     use super::*;
 
     #[test]
@@ -77,6 +96,10 @@ mod tests {
     fn comparison() {
         let before = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
         let after = Time::new("Sat, 21 Jan 2023 12:25:21 +0100");
+        assert!(after > before);
+
+        let before = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
+        let after = Time::now();
         assert!(after > before);
     }
 

@@ -1,3 +1,4 @@
+use crate::time::Time;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -5,7 +6,7 @@ pub struct Task {
     pub id: usize,
     task_completed: bool,
     description: String,
-    //creation_time: Time,
+    creation_time: Time,
 }
 
 #[derive(Debug, Clone)]
@@ -21,6 +22,7 @@ impl Task {
             id,
             task_completed: false,
             description: "".to_string(),
+            creation_time: Time::now(),
         }
     }
 
