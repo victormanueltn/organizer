@@ -7,6 +7,7 @@ pub struct Task {
     task_completed: bool,
     description: String,
     creation_time: Time,
+    completion_time: Option<Time>,
 }
 
 #[derive(Debug, Clone)]
@@ -23,6 +24,7 @@ impl Task {
             task_completed: false,
             description: "".to_string(),
             creation_time: Time::now(),
+            completion_time: None,
         }
     }
 
