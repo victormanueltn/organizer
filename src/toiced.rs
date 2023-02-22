@@ -10,7 +10,7 @@ pub(crate) trait ToIced {
 
 pub(crate) fn add_button<Message>(text: &str, message: Message) -> Button<Message> {
     let text = Text::new(text)
-        .width(Length::Units(60))
+        .width(Length::try_from(60).unwrap())
         .horizontal_alignment(alignment::Horizontal::Center)
         .size(20);
     button(text).on_press(message).padding(10)

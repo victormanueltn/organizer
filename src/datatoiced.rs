@@ -16,11 +16,11 @@ impl ToIced for Data {
         let messages: Vec<_> = self
             .tasks
             .iter()
-            .enumerate()
-            .filter(|(_, task)| {
+            .filter(|task| {
                 (task.completed() && self.filters.complete)
                     || (!task.completed() && self.filters.todo)
             })
+            .enumerate()
             .map(|(index, task)| {
                 task.view()
                     .map(move |message| Message::Task(index, message))
@@ -41,7 +41,7 @@ impl ToIced for Data {
 
 fn add_task_button(a_column: Column<Message>) -> Column<Message> {
     let create_task_text = Text::new("Add a new task")
-        .width(Length::Units(120))
+        .width(Length::try_from(120).unwrap())
         .horizontal_alignment(alignment::Horizontal::Center)
         .size(20);
     let edit_button = button(create_task_text)
