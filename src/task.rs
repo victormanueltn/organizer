@@ -2,12 +2,12 @@ use crate::time::Time;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct Task {
+pub(crate) struct Task {
     pub id: usize,
     task_completed: bool,
     description: String,
-    creation_time: Time,
-    completion_time: Option<Time>,
+    pub creation_time: Time,
+    pub completion_time: Option<Time>,
 }
 
 #[derive(Debug, Clone)]

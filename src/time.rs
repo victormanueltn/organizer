@@ -12,7 +12,7 @@ pub(crate) struct Time {
 pub(crate) struct Duration(chrono::Duration);
 
 impl Duration {
-    fn new(minutes: i64) -> Self {
+    pub(crate) fn new(minutes: i64) -> Self {
         Self(chrono::Duration::minutes(minutes))
     }
 }
@@ -40,10 +40,10 @@ impl Time {
     }
 }
 
-impl std::ops::Sub<Self> for Time {
+impl<'a, 'b> std::ops::Sub<&'b Self> for &'a Time {
     type Output = Duration;
-    fn sub(self, rhs: Self) -> Self::Output {
-        Duration(self.time - rhs.time)
+    fn sub(self, other: &'b Self) -> Self::Output {
+        Duration(self.time - other.time)
     }
 }
 
@@ -107,7 +107,7 @@ mod tests {
     fn equality() {
         let before = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
         let after = Time::new("Sat, 21 Jan 2023 13:25:20 +0100");
-        let duration_1 = after - before;
+        let duration_1 = &after - &&before;
         let duration_2 = Duration::new(60);
         assert_eq!(duration_1, duration_2);
     }
