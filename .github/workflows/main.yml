@@ -61,8 +61,9 @@ jobs:
           override: true
 
       - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@master
+        uses: actions-rs/tarpaulin@v0.1
         with:
+          version: '0.15.0'
           args: '--ignore-tests --exclude-files lib.rs *toiced.rs --fail-under 100 --out Html'
       
       - name: Upload test coverage output
