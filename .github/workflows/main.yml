@@ -61,7 +61,7 @@ jobs:
           override: true
 
       - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
+        uses: actions-rs/tarpaulin@master
         with:
           args: '--ignore-tests --exclude-files lib.rs *toiced.rs --fail-under 100 --out Html'
       
