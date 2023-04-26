@@ -2,12 +2,9 @@ use crate::task::{self, Task};
 use crate::time::Duration;
 use crate::time::Time;
 use crate::toiced::{add_button, ToIced};
-use iced::theme::TextInput;
-use iced::theme::{palette, Palette};
 use iced::widget::text_input::StyleSheet;
 use iced::widget::{checkbox, row, text_input};
 use iced::Element;
-use iced::Theme;
 
 struct TextInputStyle {
     theme: iced::theme::Theme,
@@ -87,19 +84,18 @@ impl ToIced for Task {
         );
 
         let text_transparency = {
-            let transparency = if let Some(ref completion_time) = self.completion_time {
+            if let Some(ref completion_time) = self.completion_time {
                 let elapsed_time = &Time::now() - &completion_time;
                 let fade_out_time = 60;
                 1. - elapsed_time / Duration::new(fade_out_time)
             } else {
                 1.
-            };
-            transparency
+            }
         };
 
         let text_input_style = TextInputStyle {
             theme: iced::Theme::Light,
-            text_transparency: text_transparency,
+            text_transparency,
         };
 
         let text_input_theme = iced::theme::TextInput::Custom(Box::new(text_input_style));
