@@ -1,4 +1,3 @@
-
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 
@@ -7,7 +6,7 @@ pub(crate) struct Time {
     time: DateTime<FixedOffset>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, PartialOrd)]
 pub(crate) struct Duration(chrono::Duration);
 
 impl Duration {
@@ -77,13 +76,12 @@ impl<'de> Deserialize<'de> for Time {
 #[cfg(test)]
 mod tests {
     use super::*;
-use std::fmt;
-impl fmt::Display for Time {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.time.to_rfc2822())
+    use std::fmt;
+    impl fmt::Display for Time {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", self.time.to_rfc2822())
+        }
     }
-}
-
 
     #[test]
     fn new_from_string() {

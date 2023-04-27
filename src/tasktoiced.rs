@@ -11,6 +11,8 @@ struct TextInputStyle {
     text_transparency: f32,
 }
 
+pub(crate) const FADE_OUT_TIME: i64 = 1;
+
 impl StyleSheet for TextInputStyle {
     type Style = iced::Theme;
 
@@ -81,8 +83,7 @@ impl ToIced for Task {
         let text_transparency = {
             if let Some(ref completion_time) = self.completion_time {
                 let elapsed_time = &Time::now() - &completion_time;
-                let fade_out_time = 60;
-                1. - elapsed_time / Duration::new(fade_out_time)
+                1. - elapsed_time / Duration::new(FADE_OUT_TIME)
             } else {
                 1.
             }

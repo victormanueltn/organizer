@@ -1,4 +1,5 @@
-use crate::time::Time;
+use crate::time::{Duration, Time};
+use crate::tasktoiced::FADE_OUT_TIME;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -30,6 +31,14 @@ impl Task {
 
     pub fn completed(&self) -> bool {
         self.task_completed
+    }
+
+    pub fn visible_as_pending(&self) -> bool {
+        if !self.task_completed {
+            true
+        } else {
+            &Time::now() - &&self.completion_time.as_ref().unwrap() < Duration::new(FADE_OUT_TIME)
+        }
     }
 
     pub fn set_completed(&mut self, completed: bool) {

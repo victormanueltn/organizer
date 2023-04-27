@@ -18,7 +18,7 @@ impl ToIced for Data {
             .iter()
             .filter(|task| {
                 (task.completed() && self.filters.complete)
-                    || (!task.completed() && self.filters.todo)
+                    || (task.visible_as_pending() && self.filters.todo)
             })
             .enumerate()
             .map(|(index, task)| {
