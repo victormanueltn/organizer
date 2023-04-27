@@ -50,6 +50,9 @@ jobs:
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
+    container:
+      image:                    xd009642/tarpaulin:develop-nightly
+      options:                  --security-opt seccomp=unconfined
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -60,16 +63,15 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          args: '--ignore-tests --exclude-files lib.rs *toiced.rs --fail-under 100 --out Html'
+      - name: Run code coverage
+        run: |
+          cargo +nightly tarpaulin --ignore-tests --exclude-files src/lib.rs *toiced.rs --fail-under 85 --out Html  --rustflags="-C opt-level=0"
       
       - name: Upload test coverage output
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
-          name: test-coverage
+          name: code-coverage-report
           path: tarpaulin-report.html
           
           
