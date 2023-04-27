@@ -11,7 +11,7 @@ struct TextInputStyle {
     text_transparency: f32,
 }
 
-pub(crate) const FADE_OUT_TIME: i64 = 1;
+pub(crate) const FADE_OUT_TIME: i64 = 60*24;
 
 impl StyleSheet for TextInputStyle {
     type Style = iced::Theme;
