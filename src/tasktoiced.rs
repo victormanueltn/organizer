@@ -83,7 +83,12 @@ impl ToIced for Task {
         let text_transparency = {
             if let Some(ref completion_time) = self.completion_time {
                 let elapsed_time = &Time::now() - &completion_time;
-                1. - elapsed_time / Duration::new(FADE_OUT_TIME)
+                let fade_out_time = Duration::new(FADE_OUT_TIME);
+                if elapsed_time < fade_out_time {
+                    1. - elapsed_time / fade_out_time
+                } else {
+                    1.
+                }
             } else {
                 1.
             }
