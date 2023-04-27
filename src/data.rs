@@ -75,7 +75,7 @@ mod tests {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
             filters: Filters {
                 todo: true,
-                complete: true,
+                complete: false,
             },
         };
 
