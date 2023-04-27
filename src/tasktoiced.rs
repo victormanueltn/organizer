@@ -60,11 +60,6 @@ impl StyleSheet for TextInputStyle {
 
     fn selection_color(&self, _style: &Self::Style) -> iced::Color {
         let palette = self.theme.extended_palette();
-
-        //let mut test_color = palette.background.base.text;
-        //test_color.a = 0.1;
-        //test_color
-
         palette.primary.weak.color
     }
 
