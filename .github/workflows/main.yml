@@ -63,7 +63,7 @@ jobs:
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
-          version: '0.15.0'
+          version: '0.25.2'
           args: '--ignore-tests --exclude-files lib.rs *toiced.rs --fail-under 100 --out Html  --rustflags="-C opt-level=0"'
       
       - name: Upload test coverage output
