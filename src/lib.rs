@@ -29,8 +29,8 @@ impl Sandbox for Organizer {
             data: Data {
                 tasks: vec![],
                 filters: Filters {
-                    complete: true,
                     todo: true,
+                    complete: false,
                 },
             },
             error_text: None,
