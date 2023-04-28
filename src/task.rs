@@ -37,7 +37,7 @@ impl Task {
         if !self.task_completed {
             true
         } else {
-            &Time::now() - &self.completion_time.as_ref().unwrap() < Duration::new(FADE_OUT_TIME)
+            &Time::now() - self.completion_time.as_ref().unwrap() < Duration::new(FADE_OUT_TIME)
         }
     }
 
