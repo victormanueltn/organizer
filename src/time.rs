@@ -32,9 +32,9 @@ impl Time {
     }
 }
 
-impl<'a, 'b> std::ops::Sub<&'b Self> for &'a Time {
+impl<'a, 'b> std::ops::Sub<&'b Time> for &'a Time {
     type Output = Duration;
-    fn sub(self, other: &'b Self) -> Self::Output {
+    fn sub(self, other: &'b Time) -> Self::Output {
         Duration(self.time - other.time)
     }
 }
@@ -105,7 +105,7 @@ mod tests {
     fn equality() {
         let before = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
         let after = Time::new("Sat, 21 Jan 2023 13:25:20 +0100");
-        let duration_1 = &after - &&before;
+        let duration_1 = &after - &before;
         let duration_2 = Duration::new(60);
         assert_eq!(duration_1, duration_2);
     }
