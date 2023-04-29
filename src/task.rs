@@ -128,4 +128,28 @@ mod tests {
         task.set_completed(true);
         assert!(task.completion_time.is_some());
     }
+
+    //pub fn visible_as_pending(&self) -> bool {
+    //    if !self.task_completed {
+    //        true
+    //    } else {
+    //        &Time::now() - self.completion_time.as_ref().unwrap() < Duration::new(FADE_OUT_TIME)
+    //    }
+    //}
+
+    #[test]
+    fn visible_as_pending_test() {
+        let mut task = Task::new(1);
+
+        task.set_completed(false);
+        assert!(task.visible_as_pending());
+
+        task.set_completed(true);
+        task.completion_time = Option::Some(Time::now());
+        assert!(task.visible_as_pending());
+
+        let far_away_time = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
+        task.completion_time = Option::Some(far_away_time);
+        assert!(!task.visible_as_pending());
+    }
 }

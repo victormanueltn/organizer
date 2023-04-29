@@ -16,7 +16,7 @@ impl Duration {
 }
 
 impl Time {
-    fn new(time: &str) -> Time {
+    pub(crate) fn new(time: &str) -> Time {
         Time {
             time: DateTime::parse_from_rfc2822(time).unwrap(),
         }
