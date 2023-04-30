@@ -2,12 +2,13 @@ mod data;
 mod task;
 mod tasktoiced;
 mod views;
-use crate::views::{ListMessage, Message};
+use crate::views::{ListMessage, Message, ViewType};
 use data::{Data, Filters};
 mod datatoiced;
 mod time;
 mod toiced;
 use crate::toiced::add_button;
+use iced::widget::pick_list;
 use iced::widget::text_input;
 use iced::widget::{column, row};
 use iced::Element;
@@ -20,12 +21,7 @@ pub struct Organizer {
     data: Data,
     error_text: Option<String>,
     file_name: String,
-    view_type: ViewType,
-}
-
-enum ViewType {
-    List,
-    Summary,
+    view_type: Option<ViewType>,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -43,7 +39,7 @@ impl Sandbox for Organizer {
             },
             error_text: None,
             file_name: String::new(),
-            view_type: ViewType::List,
+            view_type: Some(ViewType::List),
         }
     }
 
@@ -52,7 +48,7 @@ impl Sandbox for Organizer {
     }
 
     fn view(&self) -> Element<Message> {
-        match self.view_type {
+        match self.view_type.unwrap() {
             ViewType::List => self
                 .view_as_list()
                 .map(move |message| Message::ListViewMessage(message)),
@@ -122,7 +118,14 @@ impl Organizer {
             .spacing(10)
             .padding(10);
 
-        a_column.push(a_row).push(data_view).spacing(10).into()
+        let view_pick_list = pick_list(&ViewType::ALL[..], self.view_type, ListMessage::SelectView);
+
+        a_column
+            .push(a_row)
+            .push(data_view)
+            .push(view_pick_list)
+            .spacing(10)
+            .into()
     }
 
     /*
@@ -175,6 +178,7 @@ impl Organizer {
             ListMessage::ToggleCompleteFilter(value) => {
                 self.data.filters.complete = value;
             }
+            ListMessage::SelectView(value) => self.view_type = Some(value),
         }
     }
 }
@@ -316,7 +320,10 @@ mod tests {
                 task::Message::TextInput("C".to_string()),
             )));
 
-            organizer.update(Message::ListViewMessage(ListMessage::Task(1, task::Message::DeleteTask)));
+            organizer.update(Message::ListViewMessage(ListMessage::Task(
+                1,
+                task::Message::DeleteTask,
+            )));
             assert_eq!(organizer.data.tasks.len(), 2);
 
             assert_eq!(organizer.data.tasks[0].description(), "A");
