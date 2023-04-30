@@ -1,5 +1,4 @@
 use crate::task::Task;
-use crate::task::{self};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
@@ -7,21 +6,11 @@ pub(crate) struct Data {
     pub(crate) tasks: Vec<Task>,
     pub(crate) filters: Filters,
 }
+
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub(crate) struct Filters {
     pub complete: bool,
     pub todo: bool,
-}
-
-#[derive(Debug, Clone)]
-pub enum Message {
-    AddTask,
-    Task(usize, task::Message),
-    Load,
-    UpdateSaveFileName(String),
-    Save,
-    ToggleActiveFilter(bool),
-    ToggleCompleteFilter(bool),
 }
 
 #[derive(Debug)]

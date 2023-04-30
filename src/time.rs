@@ -1,4 +1,6 @@
+use chrono::TimeZone;
 use chrono::{DateTime, FixedOffset};
+use iced_aw::date_picker;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, PartialOrd)]
@@ -64,17 +66,28 @@ impl<'de> Deserialize<'de> for Time {
         D: serde::Deserializer<'de>,
     {
         let description = String::deserialize(deserializer)?;
-        //        match chrono::DateTime::parse_from_rfc2822(&description) {
         match chrono::DateTime::parse_from_rfc2822(&description) {
-            //            Ok(date) => Ok(Time::new(&date.to_rfc2822())),
             Ok(date) => Ok(Time::new(&date.to_rfc2822())),
             Err(message) => Err(serde::de::Error::custom(message)),
         }
     }
 }
 
+impl From<date_picker::Date> for Time {
+    fn from(item: date_picker::Date) -> Self {
+        let hour = 0;
+        let minute = 0;
+        let second = 0;
+        let date = chrono::Utc
+            .with_ymd_and_hms(item.year, item.month, item.day, hour, minute, second)
+            .unwrap();
+        Time::new(&date.to_rfc2822())
+    }
+}
+
 #[cfg(test)]
 mod tests {
+
     use super::*;
     use std::fmt;
     impl fmt::Display for Time {
@@ -134,5 +147,18 @@ mod tests {
         let duration_1 = Duration::new(1);
         let duration_2 = Duration::new(0);
         let _ = duration_1 / duration_2;
+    }
+
+    #[test]
+    fn iced_date_to_time() {
+        let iced_date = date_picker::Date {
+            year: 2023,
+            month: 4,
+            day: 29,
+        };
+        let date = chrono::Utc
+            .with_ymd_and_hms(iced_date.year, iced_date.month, iced_date.day, 14, 09, 0)
+            .unwrap();
+        let time = Time::new(&date.to_rfc2822());
     }
 }

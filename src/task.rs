@@ -129,14 +129,6 @@ mod tests {
         assert!(task.completion_time.is_some());
     }
 
-    //pub fn visible_as_pending(&self) -> bool {
-    //    if !self.task_completed {
-    //        true
-    //    } else {
-    //        &Time::now() - self.completion_time.as_ref().unwrap() < Duration::new(FADE_OUT_TIME)
-    //    }
-    //}
-
     #[test]
     fn visible_as_pending_test() {
         let mut task = Task::new(1);

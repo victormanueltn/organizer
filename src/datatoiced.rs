@@ -1,7 +1,5 @@
-use crate::{
-    data::{Data, Message},
-    toiced::ToIced,
-};
+use crate::views::ListMessage;
+use crate::{data::Data, toiced::ToIced};
 use iced::{
     alignment,
     widget::{button, column, container, Column, Text},
@@ -9,7 +7,7 @@ use iced::{
 };
 
 impl ToIced for Data {
-    type Message = Message;
+    type Message = ListMessage;
     fn view(&self) -> Element<Self::Message> {
         let mut a_column = column(vec![]);
 
@@ -23,7 +21,7 @@ impl ToIced for Data {
             .enumerate()
             .map(|(index, task)| {
                 task.view()
-                    .map(move |message| Message::Task(index, message))
+                    .map(move |message| ListMessage::Task(index, message))
             })
             .collect();
 
@@ -39,13 +37,13 @@ impl ToIced for Data {
     }
 }
 
-fn add_task_button(a_column: Column<Message>) -> Column<Message> {
+fn add_task_button(a_column: Column<ListMessage>) -> Column<ListMessage> {
     let create_task_text = Text::new("Add a new task")
         .width(Length::try_from(120).unwrap())
         .horizontal_alignment(alignment::Horizontal::Center)
         .size(20);
     let edit_button = button(create_task_text)
-        .on_press(Message::AddTask)
+        .on_press(ListMessage::AddTask)
         .padding(10);
 
     a_column

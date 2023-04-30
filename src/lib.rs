@@ -1,13 +1,15 @@
 mod data;
 mod task;
 mod tasktoiced;
-use data::{Data, Filters, Message};
+mod views;
+use crate::views::{ListMessage, Message};
+use data::{Data, Filters};
 mod datatoiced;
 mod time;
 mod toiced;
 use crate::toiced::add_button;
-use iced::widget::column;
 use iced::widget::text_input;
+use iced::widget::{column, row};
 use iced::Element;
 use iced::Sandbox;
 use iced::{widget::Text, Alignment};
@@ -18,11 +20,17 @@ pub struct Organizer {
     data: Data,
     error_text: Option<String>,
     file_name: String,
+    view_type: ViewType,
+}
+
+enum ViewType {
+    List,
+    Summary,
 }
 
 #[cfg(not(tarpaulin_include))]
 impl Sandbox for Organizer {
-    type Message = data::Message;
+    type Message = Message;
 
     fn new() -> Self {
         Organizer {
@@ -35,6 +43,7 @@ impl Sandbox for Organizer {
             },
             error_text: None,
             file_name: String::new(),
+            view_type: ViewType::List,
         }
     }
 
@@ -42,82 +51,22 @@ impl Sandbox for Organizer {
         String::from("Organizer")
     }
 
-    #[cfg(not(tarpaulin_include))]
     fn view(&self) -> Element<Message> {
-        use iced::widget::row;
-
-        let button_todo_tasks = iced::widget::Checkbox::new(
-            "Todo",
-            self.data.filters.todo,
-            Message::ToggleActiveFilter,
-        );
-        let button_complete_tasks = iced::widget::Checkbox::new(
-            "Complete",
-            self.data.filters.complete,
-            Message::ToggleCompleteFilter,
-        );
-
-        let a_row = row![button_todo_tasks, button_complete_tasks].spacing(40);
-
-        let data_view = self.data.view();
-        let mut a_column = column(vec![a_row.into()]).align_items(Alignment::Center);
-        if let Some(ref error_text) = self.error_text {
-            a_column = a_column
-                .push(Text::new(error_text).style(iced::Color::from_rgb(1., 0., 0.)))
-                .align_items(Alignment::Center);
+        match self.view_type {
+            ViewType::List => self
+                .view_as_list()
+                .map(move |message| Message::ListViewMessage(message)),
+            //ViewType::Summary => self.view_as_summary(),
+            ViewType::Summary => self
+                .view_as_list()
+                .map(move |message| Message::ListViewMessage(message)),
         }
-
-        let file_name_input = text_input(
-            "Name of the task list",
-            &self.file_name,
-            Message::UpdateSaveFileName,
-        )
-        .padding(10);
-        let load_button = add_button("Save task list", Message::Save);
-        let save_button = add_button("Load task list", Message::Load);
-        let a_row = row!(file_name_input, save_button, load_button)
-            .spacing(10)
-            .padding(10);
-
-        a_column.push(a_row).push(data_view).spacing(10).into()
     }
 
     fn update(&mut self, message: Message) {
         self.error_text = None;
         match message {
-            Message::AddTask => self.add_task(),
-            Message::Task(task_id, task_message) => {
-                if task_id > self.data.tasks.len() {
-                    panic!("Tried to update inexisting task.")
-                };
-                self.process_task_message(task_id, task_message)
-            }
-            Message::UpdateSaveFileName(file_name) => {
-                self.file_name = file_name;
-            }
-            Message::Load => {
-                let loaded_data = Data::load(&self.file_name);
-                match loaded_data {
-                    Ok(loaded_data) => self.data = loaded_data,
-                    Err(error) => {
-                        self.error_text =
-                            Some(format!("{0:?} problem: {1:?}", error.kind, error.message))
-                    }
-                }
-            }
-            Message::Save => {
-                let save_result = self.data.save(&self.file_name);
-                if let Err(error) = save_result {
-                    self.error_text =
-                        Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
-                }
-            }
-            Message::ToggleActiveFilter(value) => {
-                self.data.filters.todo = value;
-            }
-            Message::ToggleCompleteFilter(value) => {
-                self.data.filters.complete = value;
-            }
+            Message::ListViewMessage(message) => self.update_list_view(message),
         }
     }
 }
@@ -135,6 +84,96 @@ impl Organizer {
                 task::Message::DeleteTask => {
                     self.data.tasks.remove(task_id);
                 }
+            }
+        }
+    }
+
+    fn view_as_list(&self) -> Element<ListMessage> {
+        let button_todo_tasks = iced::widget::Checkbox::new(
+            "Todo",
+            self.data.filters.todo,
+            ListMessage::ToggleActiveFilter,
+        );
+        let button_complete_tasks = iced::widget::Checkbox::new(
+            "Complete",
+            self.data.filters.complete,
+            ListMessage::ToggleCompleteFilter,
+        );
+
+        let a_row = row![button_todo_tasks, button_complete_tasks].spacing(40);
+
+        let data_view = self.data.view();
+        let mut a_column = column(vec![a_row.into()]).align_items(Alignment::Center);
+        if let Some(ref error_text) = self.error_text {
+            a_column = a_column
+                .push(Text::new(error_text).style(iced::Color::from_rgb(1., 0., 0.)))
+                .align_items(Alignment::Center);
+        }
+
+        let file_name_input = text_input(
+            "Name of the task list",
+            &self.file_name,
+            ListMessage::UpdateSaveFileName,
+        )
+        .padding(10);
+        let load_button = add_button("Save task list", ListMessage::Save);
+        let save_button = add_button("Load task list", ListMessage::Load);
+        let a_row = row!(file_name_input, save_button, load_button)
+            .spacing(10)
+            .padding(10);
+
+        a_column.push(a_row).push(data_view).spacing(10).into()
+    }
+
+    /*
+    fn view_as_summary(&self) -> Element<Message> {
+        let file_name_input = text_input(
+            "Initial date",
+            &self.file_name,
+            ListMessage::UpdateSaveFileName,
+        )
+        .padding(10);
+        let a_row = row!(file_name_input).spacing(10).padding(10);
+
+        let mut a_column = column(vec![]).align_items(Alignment::Center);
+        a_column.push(a_row).spacing(10).into()
+    }
+    */
+
+    fn update_list_view(&mut self, message: ListMessage) {
+        match message {
+            ListMessage::AddTask => self.add_task(),
+            ListMessage::Task(task_id, task_message) => {
+                if task_id > self.data.tasks.len() {
+                    panic!("Tried to update inexisting task.")
+                };
+                self.process_task_message(task_id, task_message)
+            }
+            ListMessage::UpdateSaveFileName(file_name) => {
+                self.file_name = file_name;
+            }
+            ListMessage::Load => {
+                let loaded_data = Data::load(&self.file_name);
+                match loaded_data {
+                    Ok(loaded_data) => self.data = loaded_data,
+                    Err(error) => {
+                        self.error_text =
+                            Some(format!("{0:?} problem: {1:?}", error.kind, error.message))
+                    }
+                }
+            }
+            ListMessage::Save => {
+                let save_result = self.data.save(&self.file_name);
+                if let Err(error) = save_result {
+                    self.error_text =
+                        Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
+                }
+            }
+            ListMessage::ToggleActiveFilter(value) => {
+                self.data.filters.todo = value;
+            }
+            ListMessage::ToggleCompleteFilter(value) => {
+                self.data.filters.complete = value;
             }
         }
     }
@@ -238,7 +277,7 @@ mod tests {
         #[test]
         fn add_task() {
             let mut organizer = Organizer::new();
-            organizer.update(Message::AddTask);
+            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
             assert_eq!(organizer.data.tasks.len(), 1);
         }
 
@@ -246,9 +285,12 @@ mod tests {
         #[should_panic]
         fn message_to_inexisting_task() {
             let mut organizer = Organizer::new();
-            organizer.update(Message::AddTask);
+            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
 
-            organizer.update(Message::Task(1, task::Message::DeleteTask));
+            organizer.update(Message::ListViewMessage(ListMessage::Task(
+                1,
+                task::Message::DeleteTask,
+            )));
             assert_eq!(organizer.data.tasks.len(), 2);
         }
 
@@ -256,16 +298,25 @@ mod tests {
         fn task_message() {
             let mut organizer = Organizer::new();
 
-            organizer.update(Message::AddTask);
-            organizer.update(Message::AddTask);
-            organizer.update(Message::AddTask);
+            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
+            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
+            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
             assert_eq!(organizer.data.tasks.len(), 3);
 
-            organizer.update(Message::Task(0, task::Message::TextInput("A".to_string())));
-            organizer.update(Message::Task(1, task::Message::TextInput("B".to_string())));
-            organizer.update(Message::Task(2, task::Message::TextInput("C".to_string())));
+            organizer.update(Message::ListViewMessage(ListMessage::Task(
+                0,
+                task::Message::TextInput("A".to_string()),
+            )));
+            organizer.update(Message::ListViewMessage(ListMessage::Task(
+                1,
+                task::Message::TextInput("B".to_string()),
+            )));
+            organizer.update(Message::ListViewMessage(ListMessage::Task(
+                2,
+                task::Message::TextInput("C".to_string()),
+            )));
 
-            organizer.update(Message::Task(1, task::Message::DeleteTask));
+            organizer.update(Message::ListViewMessage(ListMessage::Task(1, task::Message::DeleteTask)));
             assert_eq!(organizer.data.tasks.len(), 2);
 
             assert_eq!(organizer.data.tasks[0].description(), "A");
