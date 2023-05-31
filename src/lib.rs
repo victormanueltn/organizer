@@ -28,6 +28,8 @@ pub struct Organizer {
 
 struct SummaryDates {
     initial_day: u32,
+    initial_month: u32,
+    initial_year: u32,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -46,7 +48,11 @@ impl Sandbox for Organizer {
             error_text: None,
             file_name: String::new(),
             view_type: Some(ViewType::List),
-            summary_dates: SummaryDates { initial_day: 0 },
+            summary_dates: SummaryDates {
+                initial_day: 0,
+                initial_month: 0,
+                initial_year: 2023,
+            },
         }
     }
 
@@ -132,10 +138,6 @@ impl Organizer {
     }
 
     fn view_as_summary(&self) -> Element<SummaryMessage> {
-        let initial_day = self.summary_dates.initial_day.to_string();
-        let initial_day_input =
-            text_input("Initial", &initial_day, SummaryMessage::UpdateInitialDay).padding(10);
-
         let view_pick_list = pick_list(
             &ViewType::ALL[..],
             self.view_type,
@@ -144,7 +146,22 @@ impl Organizer {
 
         let a_row = row!(view_pick_list).spacing(10).padding(10);
 
-        let initial_date_row = row![initial_day_input];
+        let initial_day = self.summary_dates.initial_day.to_string();
+        let initial_day_input =
+            text_input("Initial", &initial_day, SummaryMessage::UpdateInitialDay).padding(10);
+
+        let initial_month = self.summary_dates.initial_month.to_string();
+        let initial_month_input = text_input(
+            "Initial",
+            &initial_month,
+            SummaryMessage::UpdateInitialMonth,
+        )
+        .padding(10);
+
+        let initial_year = self.summary_dates.initial_year.to_string();
+        let initial_year_input =
+            text_input("Initial", &initial_year, SummaryMessage::UpdateInitialYear).padding(10);
+        let initial_date_row = row![initial_day_input, initial_month_input, initial_year_input];
 
         let a_column = column(vec![])
             .push(a_row)
@@ -156,18 +173,25 @@ impl Organizer {
     }
 
     fn update_summary_view(&mut self, message: SummaryMessage) {
+        let handle_update = |value: &str, max_value: u32, result: &mut u32| {
+            if value.is_empty() {
+                *result = 0;
+            } else if let Ok(day) = value.parse::<u32>() {
+                if day <= max_value {
+                    *result = day
+                }
+            }
+        };
         match message {
             SummaryMessage::SelectView(value) => self.view_type = Some(value),
             SummaryMessage::UpdateInitialDay(value) => {
-                if value.is_empty() {
-                    self.summary_dates.initial_day = 0;
-                } else {
-                    if let Ok(day) = value.parse::<u32>() {
-                        if day <= 31 {
-                            self.summary_dates.initial_day = day
-                        }
-                    }
-                }
+                handle_update(&value, 31, &mut self.summary_dates.initial_day);
+            }
+            SummaryMessage::UpdateInitialMonth(value) => {
+                handle_update(&value, 12, &mut self.summary_dates.initial_month);
+            }
+            SummaryMessage::UpdateInitialYear(value) => {
+                handle_update(&value, 10000, &mut self.summary_dates.initial_year);
             }
         }
     }

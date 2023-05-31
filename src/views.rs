@@ -45,4 +45,6 @@ pub enum ListMessage {
 pub enum SummaryMessage {
     SelectView(ViewType),
     UpdateInitialDay(String),
+    UpdateInitialMonth(String),
+    UpdateInitialYear(String),
 }
