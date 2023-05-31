@@ -4,6 +4,7 @@ mod tasktoiced;
 mod views;
 use crate::views::{ListMessage, Message, ViewType};
 use data::{Data, Filters};
+use views::SummaryMessage;
 mod datatoiced;
 mod time;
 mod toiced;
@@ -22,6 +23,11 @@ pub struct Organizer {
     error_text: Option<String>,
     file_name: String,
     view_type: Option<ViewType>,
+    summary_dates: SummaryDates,
+}
+
+struct SummaryDates {
+    initial_day: u32,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -40,6 +46,7 @@ impl Sandbox for Organizer {
             error_text: None,
             file_name: String::new(),
             view_type: Some(ViewType::List),
+            summary_dates: SummaryDates { initial_day: 0 },
         }
     }
 
@@ -52,10 +59,9 @@ impl Sandbox for Organizer {
             ViewType::List => self
                 .view_as_list()
                 .map(move |message| Message::ListViewMessage(message)),
-            //ViewType::Summary => self.view_as_summary(),
             ViewType::Summary => self
-                .view_as_list()
-                .map(move |message| Message::ListViewMessage(message)),
+                .view_as_summary()
+                .map(move |message| Message::SummaryViewMessage(message)),
         }
     }
 
@@ -63,6 +69,7 @@ impl Sandbox for Organizer {
         self.error_text = None;
         match message {
             Message::ListViewMessage(message) => self.update_list_view(message),
+            Message::SummaryViewMessage(message) => self.update_summary_view(message),
         }
     }
 }
@@ -128,20 +135,50 @@ impl Organizer {
             .into()
     }
 
-    /*
-    fn view_as_summary(&self) -> Element<Message> {
-        let file_name_input = text_input(
-            "Initial date",
-            &self.file_name,
-            ListMessage::UpdateSaveFileName,
-        )
-        .padding(10);
-        let a_row = row!(file_name_input).spacing(10).padding(10);
+    fn view_as_summary(&self) -> Element<SummaryMessage> {
+        let initial_day = self.summary_dates.initial_day.to_string();
+        let initial_day_input =
+            text_input("Initial", &initial_day, SummaryMessage::UpdateInitialDay).padding(10);
 
-        let mut a_column = column(vec![]).align_items(Alignment::Center);
-        a_column.push(a_row).spacing(10).into()
+        let view_pick_list = pick_list(
+            &ViewType::ALL[..],
+            self.view_type,
+            SummaryMessage::SelectView,
+        );
+
+        let a_row = row!(view_pick_list).spacing(10).padding(10);
+
+        let initial_date_row = row![initial_day_input];
+
+        let a_column = column(vec![])
+            .push(a_row)
+            .push(initial_date_row)
+            .spacing(10)
+            .align_items(Alignment::Center)
+            .into();
+        a_column
     }
-    */
+
+    fn update_summary_view(&mut self, message: SummaryMessage) {
+        match message {
+            SummaryMessage::SelectView(value) => self.view_type = Some(value),
+            SummaryMessage::UpdateInitialDay(value) => {
+                if value.is_empty() {
+                    self.summary_dates.initial_day = 0;
+                } else {
+
+                match value.parse::<u32>() {
+                    Ok(day) => {
+                        if day <= 31 {
+                            self.summary_dates.initial_day = day
+                        }
+                    }
+                    Err(_) => (),
+                }
+                }
+            }
+        }
+    }
 
     fn update_list_view(&mut self, message: ListMessage) {
         match message {

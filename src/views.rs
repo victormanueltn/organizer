@@ -26,7 +26,7 @@ impl std::fmt::Display for ViewType {
 #[derive(Debug, Clone)]
 pub enum Message {
     ListViewMessage(ListMessage),
-    //ViewMessage(summary::Message),
+    SummaryViewMessage(SummaryMessage),
 }
 
 #[derive(Debug, Clone)]
@@ -39,4 +39,10 @@ pub enum ListMessage {
     ToggleActiveFilter(bool),
     ToggleCompleteFilter(bool),
     SelectView(ViewType),
+}
+
+#[derive(Debug, Clone)]
+pub enum SummaryMessage {
+    SelectView(ViewType),
+    UpdateInitialDay(String),
 }
