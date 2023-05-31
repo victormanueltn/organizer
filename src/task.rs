@@ -140,7 +140,7 @@ mod tests {
         task.completion_time = Option::Some(Time::now());
         assert!(task.visible_as_pending());
 
-        let far_away_time = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
+        let far_away_time = Time::from("Sat, 21 Jan 2023 12:25:20 +0100");
         task.completion_time = Option::Some(far_away_time);
         assert!(!task.visible_as_pending());
     }

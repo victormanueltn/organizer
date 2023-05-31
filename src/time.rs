@@ -17,9 +17,20 @@ impl Duration {
 }
 
 impl Time {
-    pub(crate) fn new(time: &str) -> Time {
+    pub(crate) fn new(
+        day: u32,
+        month: u32,
+        year: u32,
+        hour: u32,
+        minute: u32,
+        second: u32,
+    ) -> Time {
+        let year: i32 = year.try_into().unwrap();
         Time {
-            time: DateTime::parse_from_rfc2822(time).unwrap(),
+            time: chrono::Utc
+                .with_ymd_and_hms(year, month, day, hour, minute, second)
+                .unwrap()
+                .into(),
         }
     }
 
@@ -33,20 +44,11 @@ impl Time {
     }
 }
 
-impl From<(u32, u32, u32, u32, u32, u32)> for Time {
-    fn from(day_month_year_hour_minute_second: (u32, u32, u32, u32, u32, u32)) -> Time {
-        let year: i32 = day_month_year_hour_minute_second.2.try_into().unwrap();
-        let date = chrono::Utc
-            .with_ymd_and_hms(
-                year,
-                day_month_year_hour_minute_second.1,
-                day_month_year_hour_minute_second.0,
-                day_month_year_hour_minute_second.3,
-                day_month_year_hour_minute_second.4,
-                day_month_year_hour_minute_second.5,
-            )
-            .unwrap();
-        Time::new(&date.to_rfc2822())
+impl From<&str> for Time {
+    fn from(time: &str) -> Time {
+        Time {
+            time: DateTime::parse_from_rfc2822(time).unwrap(),
+        }
     }
 }
 
@@ -83,7 +85,7 @@ impl<'de> Deserialize<'de> for Time {
     {
         let description = String::deserialize(deserializer)?;
         match chrono::DateTime::parse_from_rfc2822(&description) {
-            Ok(date) => Ok(Time::new(&date.to_rfc2822())),
+            Ok(_) => Ok(Time::from(description.as_str())),
             Err(message) => Err(serde::de::Error::custom(message)),
         }
     }
@@ -103,25 +105,25 @@ mod tests {
     #[test]
     fn new_from_string() {
         let time_string = "Sat, 21 Jan 2023 12:25:20 +0100";
-        let time = Time::new(time_string);
+        let time = Time::from(time_string);
         assert_eq!(time.to_string(), time_string);
     }
 
     #[test]
     fn comparison() {
-        let before = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
-        let after = Time::new("Sat, 21 Jan 2023 12:25:21 +0100");
+        let before = Time::from("Sat, 21 Jan 2023 12:25:20 +0100");
+        let after = Time::from("Sat, 21 Jan 2023 12:25:21 +0100");
         assert!(after > before);
 
-        let before = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
+        let before = Time::from("Sat, 21 Jan 2023 12:25:20 +0100");
         let after = Time::now();
         assert!(after > before);
     }
 
     #[test]
     fn equality() {
-        let before = Time::new("Sat, 21 Jan 2023 12:25:20 +0100");
-        let after = Time::new("Sat, 21 Jan 2023 13:25:20 +0100");
+        let before = Time::from("Sat, 21 Jan 2023 12:25:20 +0100");
+        let after = Time::from("Sat, 21 Jan 2023 13:25:20 +0100");
         let duration_1 = &after - &before;
         let duration_2 = Duration::new(60);
         assert_eq!(duration_1, duration_2);
@@ -161,9 +163,9 @@ mod tests {
         let date = chrono::Utc
             .with_ymd_and_hms(year, month, day, 14, 09, 0)
             .unwrap();
-        let time_1 = Time::new(&date.to_rfc2822());
+        let time_1 = Time::from(date.to_rfc2822().as_str());
 
-        let time_2 = Time::from((29, 4, 2023, 14, 09, 0));
+        let time_2 = Time::new(29, 4, 2023, 14, 09, 0);
 
         assert!(time_1 == time_2);
     }
