@@ -10,6 +10,7 @@ mod time;
 mod toiced;
 use crate::toiced::add_button;
 use iced::widget::pick_list;
+use iced::widget::text;
 use iced::widget::text_input;
 use iced::widget::{column, row};
 use iced::Element;
@@ -147,25 +148,36 @@ impl Organizer {
         let a_row = row!(view_pick_list).spacing(10).padding(10);
 
         let initial_day = self.summary_dates.initial_day.to_string();
-        let initial_day_input =
-            text_input("Initial", &initial_day, SummaryMessage::UpdateInitialDay).padding(10);
+        let initial_day_input = text_input(
+            "Initial day",
+            &initial_day,
+            SummaryMessage::UpdateInitialDay,
+        )
+        .padding(10);
 
         let initial_month = self.summary_dates.initial_month.to_string();
         let initial_month_input = text_input(
-            "Initial",
+            "Initial month",
             &initial_month,
             SummaryMessage::UpdateInitialMonth,
         )
         .padding(10);
 
         let initial_year = self.summary_dates.initial_year.to_string();
-        let initial_year_input =
-            text_input("Initial", &initial_year, SummaryMessage::UpdateInitialYear).padding(10);
+        let initial_year_input = text_input(
+            "Initial year",
+            &initial_year,
+            SummaryMessage::UpdateInitialYear,
+        )
+        .padding(10);
         let initial_date_row = row![initial_day_input, initial_month_input, initial_year_input];
+
+        let initial_date_label = row![text("Initial date: Day/Month/Year")];
 
         let a_column = column(vec![])
             .push(a_row)
             .push(initial_date_row)
+            .push(initial_date_label)
             .spacing(10)
             .align_items(Alignment::Center)
             .into();
