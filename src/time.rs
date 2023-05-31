@@ -1,3 +1,4 @@
+use chrono::TimeZone;
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 
@@ -29,6 +30,23 @@ impl Time {
                 DateTime::parse_from_rfc2822(&now.to_rfc2822()).unwrap()
             },
         }
+    }
+}
+
+impl From<(u32, u32, u32, u32, u32, u32)> for Time {
+    fn from(day_month_year_hour_minute_second: (u32, u32, u32, u32, u32, u32)) -> Time {
+        let year: i32 = day_month_year_hour_minute_second.2.try_into().unwrap();
+        let date = chrono::Utc
+            .with_ymd_and_hms(
+                year,
+                day_month_year_hour_minute_second.1,
+                day_month_year_hour_minute_second.0,
+                day_month_year_hour_minute_second.3,
+                day_month_year_hour_minute_second.4,
+                day_month_year_hour_minute_second.5,
+            )
+            .unwrap();
+        Time::new(&date.to_rfc2822())
     }
 }
 
@@ -143,6 +161,10 @@ mod tests {
         let date = chrono::Utc
             .with_ymd_and_hms(year, month, day, 14, 09, 0)
             .unwrap();
-        let time = Time::new(&date.to_rfc2822());
+        let time_1 = Time::new(&date.to_rfc2822());
+
+        let time_2 = Time::from((29, 4, 2023, 14, 09, 0));
+
+        assert!(time_1 == time_2);
     }
 }
