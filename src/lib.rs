@@ -56,12 +56,8 @@ impl Sandbox for Organizer {
 
     fn view(&self) -> Element<Message> {
         match self.view_type.unwrap() {
-            ViewType::List => self
-                .view_as_list()
-                .map(move |message| Message::ListViewMessage(message)),
-            ViewType::Summary => self
-                .view_as_summary()
-                .map(move |message| Message::SummaryViewMessage(message)),
+            ViewType::List => self.view_as_list().map(Message::ListViewMessage),
+            ViewType::Summary => self.view_as_summary().map(Message::SummaryViewMessage),
         }
     }
 
@@ -166,15 +162,11 @@ impl Organizer {
                 if value.is_empty() {
                     self.summary_dates.initial_day = 0;
                 } else {
-
-                match value.parse::<u32>() {
-                    Ok(day) => {
+                    if let Ok(day) = value.parse::<u32>() {
                         if day <= 31 {
                             self.summary_dates.initial_day = day
                         }
                     }
-                    Err(_) => (),
-                }
                 }
             }
         }
