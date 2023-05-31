@@ -156,7 +156,7 @@ mod tests {
     }
 
     #[test]
-    fn iced_date_to_time() {
+    fn new() {
         let year = 2023;
         let month = 4;
         let day = 29;
@@ -166,7 +166,12 @@ mod tests {
         let time_1 = Time::from(date.to_rfc2822().as_str());
 
         let time_2 = Time::new(29, 4, 2023, 14, 09, 0);
-
         assert!(time_1 == time_2);
+
+        let time_2 = Time::new(29, 4, 2023, 14, 09, 1);
+        assert!(time_1 < time_2);
+
+        let time_2 = Time::new(29, 4, 2023, 14, 08, 59);
+        assert!(time_1 > time_2);
     }
 }
