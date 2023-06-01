@@ -1,14 +1,13 @@
 mod data;
+mod datatoiced;
 mod task;
 mod tasktoiced;
-mod views;
-use crate::views::{ListMessage, Message, ViewType};
-use data::{Data, Filters};
-use views::SummaryMessage;
-mod datatoiced;
 mod time;
 mod toiced;
+mod views;
 use crate::toiced::add_button;
+use crate::views::{ListMessage, Message, ViewType};
+use data::{Data, Filters};
 use iced::widget::pick_list;
 use iced::widget::text;
 use iced::widget::text_input;
@@ -17,7 +16,9 @@ use iced::Element;
 use iced::Sandbox;
 use iced::{widget::Text, Alignment};
 use task::Task;
+use time::Time;
 use toiced::ToIced;
+use views::SummaryMessage;
 
 pub struct Organizer {
     data: Data,

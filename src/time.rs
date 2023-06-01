@@ -1,5 +1,5 @@
-use chrono::TimeZone;
 use chrono::{DateTime, FixedOffset};
+use chrono::{LocalResult, TimeZone};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, PartialOrd)]
@@ -16,6 +16,9 @@ impl Duration {
     }
 }
 
+#[derive(Debug)]
+pub struct TimeError {}
+
 impl Time {
     pub(crate) fn new(
         day: u32,
@@ -24,13 +27,13 @@ impl Time {
         hour: u32,
         minute: u32,
         second: u32,
-    ) -> Time {
+    ) -> Result<Time, TimeError> {
         let year: i32 = year.try_into().unwrap();
-        Time {
-            time: chrono::Utc
-                .with_ymd_and_hms(year, month, day, hour, minute, second)
-                .unwrap()
-                .into(),
+        let time = chrono::Utc.with_ymd_and_hms(year, month, day, hour, minute, second);
+        if let LocalResult::Single(time) = time {
+            Ok(Time { time: time.into() })
+        } else {
+            Err(TimeError {})
         }
     }
 
@@ -166,12 +169,12 @@ mod tests {
         let time_1 = Time::from(date.to_rfc2822().as_str());
 
         let time_2 = Time::new(29, 4, 2023, 14, 09, 0);
-        assert!(time_1 == time_2);
+        assert!(time_1 == time_2.unwrap());
 
         let time_2 = Time::new(29, 4, 2023, 14, 09, 1);
-        assert!(time_1 < time_2);
+        assert!(time_1 < time_2.unwrap());
 
         let time_2 = Time::new(29, 4, 2023, 14, 08, 59);
-        assert!(time_1 > time_2);
+        assert!(time_1 > time_2.unwrap());
     }
 }
