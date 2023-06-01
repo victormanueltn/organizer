@@ -32,6 +32,7 @@ struct SummaryDates {
     initial_day: u32,
     initial_month: u32,
     initial_year: u32,
+    initial_date: Time,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -54,6 +55,7 @@ impl Sandbox for Organizer {
                 initial_day: 0,
                 initial_month: 0,
                 initial_year: 2023,
+                initial_date: Time::new(1, 1, 1900, 0, 0, 0).unwrap(),
             },
         }
     }
@@ -175,14 +177,27 @@ impl Organizer {
 
         let initial_date_label = row![text("Initial date: Day/Month/Year")];
 
-        let a_column = column(vec![])
+        let initial_date = Time::new(
+            self.summary_dates.initial_day,
+            self.summary_dates.initial_month,
+            self.summary_dates.initial_year,
+            0,
+            0,
+            0,
+        );
+
+        let mut a_column = column(vec![]);
+
+        a_column = a_column
             .push(a_row)
             .push(initial_date_row)
-            .push(initial_date_label)
-            .spacing(10)
-            .align_items(Alignment::Center)
-            .into();
-        a_column
+            .push(initial_date_label);
+
+        if let Err(_) = initial_date {
+            a_column = a_column.push(row![text("WRONG INITIAL DATE: date does not exist!")]);
+        }
+
+        a_column.spacing(10).align_items(Alignment::Center).into()
     }
 
     fn update_summary_view(&mut self, message: SummaryMessage) {
