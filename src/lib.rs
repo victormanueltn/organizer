@@ -33,6 +33,10 @@ struct SummaryDates {
     initial_month: u32,
     initial_year: u32,
     initial_date: Result<Time, TimeError>,
+    final_day: u32,
+    final_month: u32,
+    final_year: u32,
+    final_date: Result<Time, TimeError>,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -52,10 +56,14 @@ impl Sandbox for Organizer {
             file_name: String::new(),
             view_type: Some(ViewType::List),
             summary_dates: SummaryDates {
-                initial_day: 0,
-                initial_month: 0,
+                initial_day: 1,
+                initial_month: 1,
                 initial_year: 2023,
-                initial_date: Time::new(1, 1, 1900, 0, 0, 0),
+                initial_date: Time::new(1, 1, 2023, 0, 0, 0),
+                final_day: 31,
+                final_month: 12,
+                final_year: 3023,
+                final_date: Time::new(31, 12, 3023, 0, 0, 0),
             },
         }
     }
@@ -186,6 +194,34 @@ impl Organizer {
             0,
         );
 
+        let final_day = self.summary_dates.final_day.to_string();
+        let final_day_input =
+            text_input("Final day", &final_day, SummaryMessage::UpdateFinalDay).padding(10);
+
+        let final_month = self.summary_dates.final_month.to_string();
+        let final_month_input = text_input(
+            "Initial month",
+            &final_month,
+            SummaryMessage::UpdateFinalMonth,
+        )
+        .padding(10);
+
+        let final_year = self.summary_dates.final_year.to_string();
+        let final_year_input =
+            text_input("Initial year", &final_year, SummaryMessage::UpdateFinalYear).padding(10);
+        let final_date_row = row![final_day_input, final_month_input, final_year_input];
+
+        let final_date_label = row![text("Final date: Day/Month/Year")];
+
+        let final_date = Time::new(
+            self.summary_dates.final_day,
+            self.summary_dates.final_month,
+            self.summary_dates.final_year,
+            23,
+            59,
+            59,
+        );
+
         let mut a_column = column(vec![]);
 
         a_column = a_column
@@ -195,6 +231,12 @@ impl Organizer {
 
         if let Err(_) = initial_date {
             a_column = a_column.push(row![text("WRONG INITIAL DATE: date does not exist!")]);
+        }
+
+        a_column = a_column.push(final_date_row).push(final_date_label);
+
+        if let Err(_) = final_date {
+            a_column = a_column.push(row![text("WRONG FINAL DATE: date does not exist!")]);
         }
 
         a_column.spacing(10).align_items(Alignment::Center).into()
@@ -243,6 +285,39 @@ impl Organizer {
                     0,
                     0,
                     0,
+                );
+            }
+            SummaryMessage::UpdateFinalDay(value) => {
+                handle_update(&value, 31, &mut self.summary_dates.final_day);
+                self.summary_dates.final_date = Time::new(
+                    self.summary_dates.final_day,
+                    self.summary_dates.final_month,
+                    self.summary_dates.final_year,
+                    23,
+                    59,
+                    59,
+                );
+            }
+            SummaryMessage::UpdateFinalMonth(value) => {
+                handle_update(&value, 12, &mut self.summary_dates.final_month);
+                self.summary_dates.final_date = Time::new(
+                    self.summary_dates.final_day,
+                    self.summary_dates.final_month,
+                    self.summary_dates.final_year,
+                    23,
+                    59,
+                    59,
+                );
+            }
+            SummaryMessage::UpdateFinalYear(value) => {
+                handle_update(&value, 10000, &mut self.summary_dates.final_year);
+                self.summary_dates.final_date = Time::new(
+                    self.summary_dates.final_day,
+                    self.summary_dates.final_month,
+                    self.summary_dates.final_year,
+                    23,
+                    59,
+                    59,
                 );
             }
         }

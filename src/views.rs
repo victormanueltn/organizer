@@ -47,4 +47,7 @@ pub enum SummaryMessage {
     UpdateInitialDay(String),
     UpdateInitialMonth(String),
     UpdateInitialYear(String),
+    UpdateFinalDay(String),
+    UpdateFinalMonth(String),
+    UpdateFinalYear(String),
 }
