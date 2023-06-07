@@ -224,6 +224,20 @@ impl Organizer {
 
         let mut a_column = column(vec![]);
 
+        if let (Ok(initial_date), Ok(final_date)) = (&initial_date, &final_date) {
+            let filtered_dates = &self
+                .data
+                .tasks
+                .iter()
+                .map(|task| &task.completion_time)
+                .filter(|completion_time| completion_time.is_some())
+                .map(|completion_time| completion_time.clone().unwrap())
+                .filter(|completion_time| {
+                    &&initial_date < &&completion_time && completion_time < &&final_date
+                })
+                .collect::<Vec<_>>();
+        }
+
         a_column = a_column
             .push(a_row)
             .push(initial_date_row)

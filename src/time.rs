@@ -2,7 +2,7 @@ use chrono::{DateTime, FixedOffset};
 use chrono::{LocalResult, TimeZone};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, PartialOrd)]
+#[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub(crate) struct Time {
     time: DateTime<FixedOffset>,
 }
