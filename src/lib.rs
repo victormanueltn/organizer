@@ -16,7 +16,7 @@ use iced::Element;
 use iced::Sandbox;
 use iced::{widget::Text, Alignment};
 use task::Task;
-use time::Time;
+use time::{Time, TimeError};
 use toiced::ToIced;
 use views::SummaryMessage;
 
@@ -32,7 +32,7 @@ struct SummaryDates {
     initial_day: u32,
     initial_month: u32,
     initial_year: u32,
-    initial_date: Time,
+    initial_date: Result<Time, TimeError>,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -55,7 +55,7 @@ impl Sandbox for Organizer {
                 initial_day: 0,
                 initial_month: 0,
                 initial_year: 2023,
-                initial_date: Time::new(1, 1, 1900, 0, 0, 0).unwrap(),
+                initial_date: Time::new(1, 1, 1900, 0, 0, 0),
             },
         }
     }
@@ -214,12 +214,36 @@ impl Organizer {
             SummaryMessage::SelectView(value) => self.view_type = Some(value),
             SummaryMessage::UpdateInitialDay(value) => {
                 handle_update(&value, 31, &mut self.summary_dates.initial_day);
+                self.summary_dates.initial_date = Time::new(
+                    self.summary_dates.initial_day,
+                    self.summary_dates.initial_month,
+                    self.summary_dates.initial_year,
+                    0,
+                    0,
+                    0,
+                );
             }
             SummaryMessage::UpdateInitialMonth(value) => {
                 handle_update(&value, 12, &mut self.summary_dates.initial_month);
+                self.summary_dates.initial_date = Time::new(
+                    self.summary_dates.initial_day,
+                    self.summary_dates.initial_month,
+                    self.summary_dates.initial_year,
+                    0,
+                    0,
+                    0,
+                );
             }
             SummaryMessage::UpdateInitialYear(value) => {
                 handle_update(&value, 10000, &mut self.summary_dates.initial_year);
+                self.summary_dates.initial_date = Time::new(
+                    self.summary_dates.initial_day,
+                    self.summary_dates.initial_month,
+                    self.summary_dates.initial_year,
+                    0,
+                    0,
+                    0,
+                );
             }
         }
     }
