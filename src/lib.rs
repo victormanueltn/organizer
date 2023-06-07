@@ -5,6 +5,8 @@ mod tasktoiced;
 mod time;
 mod toiced;
 mod views;
+use std::vec;
+
 use crate::toiced::add_button;
 use crate::views::{ListMessage, Message, ViewType};
 use data::{Data, Filters};
@@ -224,19 +226,21 @@ impl Organizer {
 
         let mut a_column = column(vec![]);
 
-        if let (Ok(initial_date), Ok(final_date)) = (&initial_date, &final_date) {
-            let filtered_dates = &self
-                .data
+        let descriptions = if let (Ok(initial_date), Ok(final_date)) = (&initial_date, &final_date)
+        {
+            self.data
                 .tasks
                 .iter()
-                .map(|task| &task.completion_time)
-                .filter(|completion_time| completion_time.is_some())
-                .map(|completion_time| completion_time.clone().unwrap())
-                .filter(|completion_time| {
-                    &&initial_date < &&completion_time && completion_time < &&final_date
+                .filter(|task| task.completion_time.is_some())
+                .filter(|task| {
+                    let completion_time = &task.completion_time.clone().unwrap();
+                    initial_date < completion_time && completion_time < final_date
                 })
-                .collect::<Vec<_>>();
-        }
+                .map(|task| row![text(task.description())])
+                .collect::<Vec<_>>()
+        } else {
+            vec![]
+        };
 
         a_column = a_column
             .push(a_row)
@@ -251,6 +255,10 @@ impl Organizer {
 
         if let Err(_) = final_date {
             a_column = a_column.push(row![text("WRONG FINAL DATE: date does not exist!")]);
+        }
+
+        for description in descriptions {
+            a_column = a_column.push(description);
         }
 
         a_column.spacing(10).align_items(Alignment::Center).into()
