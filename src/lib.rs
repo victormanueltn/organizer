@@ -46,6 +46,7 @@ impl Sandbox for Organizer {
     type Message = Message;
 
     fn new() -> Self {
+        let today = Time::now();
         Organizer {
             data: Data {
                 tasks: vec![],
@@ -62,10 +63,10 @@ impl Sandbox for Organizer {
                 initial_month: 1,
                 initial_year: 2023,
                 initial_date: Time::new(1, 1, 2023, 0, 0, 0),
-                final_day: 31,
-                final_month: 12,
-                final_year: 3023,
-                final_date: Time::new(31, 12, 3023, 0, 0, 0),
+                final_day: today.day(),
+                final_month: today.month(),
+                final_year: today.year(),
+                final_date: Time::new(today.day(), today.month(), today.year(), 0, 0, 0),
             },
         }
     }

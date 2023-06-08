@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Datelike, FixedOffset};
 use chrono::{LocalResult, TimeZone};
 use serde::{Deserialize, Serialize};
 
@@ -44,6 +44,18 @@ impl Time {
                 DateTime::parse_from_rfc2822(&now.to_rfc2822()).unwrap()
             },
         }
+    }
+
+    pub(crate) fn day(&self) -> u32 {
+        self.time.day()
+    }
+
+    pub(crate) fn month(&self) -> u32 {
+        self.time.month()
+    }
+
+    pub(crate) fn year(&self) -> u32 {
+        self.time.year().try_into().unwrap()
     }
 }
 
