@@ -20,7 +20,6 @@ use iced::{widget::Text, Alignment};
 use task::Task;
 use time::{Time, TimeError};
 use toiced::ToIced;
-use views::SummaryMessage;
 
 pub struct Organizer {
     data: Data,
