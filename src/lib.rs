@@ -1,4 +1,5 @@
 mod data;
+use crate::views::ListView;
 mod datatoiced;
 mod task;
 mod tasktoiced;
@@ -343,45 +344,6 @@ impl Organizer {
                     59,
                 );
             }
-        }
-    }
-
-    fn update_list_view(&mut self, message: ListMessage) {
-        match message {
-            ListMessage::AddTask => self.add_task(),
-            ListMessage::Task(task_id, task_message) => {
-                if task_id > self.data.tasks.len() {
-                    panic!("Tried to update inexisting task.")
-                };
-                self.process_task_message(task_id, task_message)
-            }
-            ListMessage::UpdateSaveFileName(file_name) => {
-                self.file_name = file_name;
-            }
-            ListMessage::Load => {
-                let loaded_data = Data::load(&self.file_name);
-                match loaded_data {
-                    Ok(loaded_data) => self.data = loaded_data,
-                    Err(error) => {
-                        self.error_text =
-                            Some(format!("{0:?} problem: {1:?}", error.kind, error.message))
-                    }
-                }
-            }
-            ListMessage::Save => {
-                let save_result = self.data.save(&self.file_name);
-                if let Err(error) = save_result {
-                    self.error_text =
-                        Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
-                }
-            }
-            ListMessage::ToggleActiveFilter(value) => {
-                self.data.filters.todo = value;
-            }
-            ListMessage::ToggleCompleteFilter(value) => {
-                self.data.filters.complete = value;
-            }
-            ListMessage::SelectView(value) => self.view_type = Some(value),
         }
     }
 }
