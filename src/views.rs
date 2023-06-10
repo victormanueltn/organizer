@@ -253,7 +253,7 @@ impl SummaryView for Organizer {
             .push(initial_date_row)
             .push(initial_date_label);
 
-        if let Err(_) = initial_date {
+        if initial_date.is_err() {
             a_column = a_column.push(iced::widget::row![iced::widget::text(
                 "WRONG INITIAL DATE: date does not exist!"
             )]);
@@ -261,7 +261,7 @@ impl SummaryView for Organizer {
 
         a_column = a_column.push(final_date_row).push(final_date_label);
 
-        if let Err(_) = final_date {
+        if final_date.is_err() {
             a_column = a_column.push(iced::widget::row![iced::widget::text(
                 "WRONG FINAL DATE: date does not exist!"
             )]);
