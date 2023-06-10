@@ -9,17 +9,13 @@ mod views;
 use std::vec;
 
 use crate::toiced::add_button;
-use crate::views::{ListMessage, Message, ViewType};
+use crate::views::{Message, ViewType};
 use data::{Data, Filters};
-use iced::widget::pick_list;
-use iced::widget::text_input;
-use iced::widget::{column, row};
+use iced::widget::Text;
 use iced::Element;
 use iced::Sandbox;
-use iced::{widget::Text, Alignment};
 use task::Task;
 use time::{Time, TimeError};
-use toiced::ToIced;
 
 pub struct Organizer {
     data: Data,
@@ -105,50 +101,6 @@ impl Organizer {
                 }
             }
         }
-    }
-
-    fn view_as_list(&self) -> Element<ListMessage> {
-        let button_todo_tasks = iced::widget::Checkbox::new(
-            "Todo",
-            self.data.filters.todo,
-            ListMessage::ToggleActiveFilter,
-        );
-        let button_complete_tasks = iced::widget::Checkbox::new(
-            "Complete",
-            self.data.filters.complete,
-            ListMessage::ToggleCompleteFilter,
-        );
-
-        let a_row = row![button_todo_tasks, button_complete_tasks].spacing(40);
-
-        let data_view = self.data.view();
-        let mut a_column = column(vec![a_row.into()]).align_items(Alignment::Center);
-        if let Some(ref error_text) = self.error_text {
-            a_column = a_column
-                .push(Text::new(error_text).style(iced::Color::from_rgb(1., 0., 0.)))
-                .align_items(Alignment::Center);
-        }
-
-        let file_name_input = text_input(
-            "Name of the task list",
-            &self.file_name,
-            ListMessage::UpdateSaveFileName,
-        )
-        .padding(10);
-        let load_button = add_button("Save task list", ListMessage::Save);
-        let save_button = add_button("Load task list", ListMessage::Load);
-        let a_row = row!(file_name_input, save_button, load_button)
-            .spacing(10)
-            .padding(10);
-
-        let view_pick_list = pick_list(&ViewType::ALL[..], self.view_type, ListMessage::SelectView);
-
-        a_column
-            .push(a_row)
-            .push(data_view)
-            .push(view_pick_list)
-            .spacing(10)
-            .into()
     }
 }
 
