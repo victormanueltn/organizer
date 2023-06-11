@@ -38,6 +38,7 @@ impl From<serde_json::Error> for FileError {
 impl Data {
     pub(crate) fn save(&self, file_name: &str) -> Result<(), FileError> {
         let serialized_data = serde_json::to_string(&self).unwrap();
+        let file_name = Self::add_extension_if_missing(file_name)?;
 
         std::fs::write(file_name, serialized_data).map_err(|_| FileError {
             message: "Problem saving file.".to_string(),
@@ -45,12 +46,36 @@ impl Data {
         })
     }
     pub(crate) fn load(file_name: &str) -> Result<Data, FileError> {
+        let file_name = Self::add_extension_if_missing(file_name)?;
         let serialized_data = std::fs::read_to_string(file_name).map_err(|_| FileError {
             message: "Problem loading file".to_string(),
             kind: FileErrorKind::Load,
         })?;
         let data = serde_json::from_str::<Self>(&serialized_data)?;
         Ok(data)
+    }
+
+    fn add_extension_if_missing(file_name: &str) -> Result<String, FileError> {
+        let extension = std::path::Path::new(file_name).extension();
+        let mut file_name = file_name.to_string();
+
+        match extension {
+            Some(extension) => {
+                if extension != "ogz" {
+                    return Err(FileError {
+                        message: "Wrong file extension. Expected '.ogz'".to_string(),
+                        kind: FileErrorKind::Write,
+                    });
+                }
+            }
+            None => file_name.push_str(".ogz"),
+        }
+
+        if file_name.contains(".") {
+        } else {
+            file_name.push_str(".ogz")
+        }
+        Ok(file_name)
     }
 }
 
