@@ -71,7 +71,7 @@ impl Data {
             None => file_name.push_str(".ogz"),
         }
 
-        if file_name.contains(".") {
+        if file_name.contains('.') {
         } else {
             file_name.push_str(".ogz")
         }

@@ -198,7 +198,7 @@ mod tests {
 
     mod update {
         use super::*;
-        use crate::views::{ListMessage};
+        use crate::views::ListMessage;
 
         #[test]
         fn add_task() {
