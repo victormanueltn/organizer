@@ -1,3 +1,4 @@
+use crate::time::Duration;
 use crate::toiced::ToIced;
 use crate::{add_button, task, Organizer};
 use crate::{Data, Text, Time};
@@ -52,6 +53,7 @@ pub enum SummaryMessage {
     UpdateFinalDay(String),
     UpdateFinalMonth(String),
     UpdateFinalYear(String),
+    LastDay,
 }
 
 pub(crate) trait ListView {
@@ -159,7 +161,10 @@ impl SummaryView for Organizer {
             SummaryMessage::SelectView,
         );
 
-        let a_row = iced::widget::row!(view_pick_list).spacing(10).padding(10);
+        let pick_list_row = iced::widget::row!(view_pick_list).spacing(10).padding(10);
+
+        let last_day_button = add_button("Last day", SummaryMessage::LastDay);
+        let last_day_row = iced::widget::row!(last_day_button).spacing(10).padding(10);
 
         let initial_day = self.summary_dates.initial_day.to_string();
         let initial_day_input = iced::widget::text_input(
@@ -249,7 +254,8 @@ impl SummaryView for Organizer {
         };
 
         a_column = a_column
-            .push(a_row)
+            .push(pick_list_row)
+            .push(last_day_row)
             .push(initial_date_row)
             .push(initial_date_label);
 
@@ -353,6 +359,32 @@ impl SummaryView for Organizer {
                     23,
                     59,
                     59,
+                );
+            }
+            SummaryMessage::LastDay => {
+                let now = Time::now();
+                let before = &now - &Duration::from_hours(24);
+                self.summary_dates.final_day = now.day();
+                self.summary_dates.final_month = now.month();
+                self.summary_dates.final_year = now.year();
+                self.summary_dates.final_date = Time::new(
+                    now.day(),
+                    now.month(),
+                    now.year(),
+                    now.hour(),
+                    now.minute(),
+                    now.second(),
+                );
+                self.summary_dates.initial_day = before.day();
+                self.summary_dates.initial_month = before.month();
+                self.summary_dates.initial_year = before.year();
+                self.summary_dates.initial_date = Time::new(
+                    before.day(),
+                    before.month(),
+                    before.year(),
+                    before.hour(),
+                    before.minute(),
+                    before.second(),
                 );
             }
         }

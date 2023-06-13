@@ -1,4 +1,4 @@
-use chrono::{DateTime, Datelike, FixedOffset};
+use chrono::{DateTime, Datelike, FixedOffset, Timelike};
 use chrono::{LocalResult, TimeZone};
 use serde::{Deserialize, Serialize};
 
@@ -8,11 +8,25 @@ pub(crate) struct Time {
 }
 
 #[derive(Debug, PartialEq, PartialOrd)]
-pub(crate) struct Duration(chrono::Duration);
+pub(crate) struct Duration {
+    duration: chrono::Duration,
+}
 
 impl Duration {
-    pub(crate) fn new(minutes: i64) -> Self {
-        Self(chrono::Duration::minutes(minutes))
+    pub(crate) fn new(duration: chrono::Duration) -> Self {
+        Self { duration }
+    }
+
+    pub(crate) fn from_minutes(minutes: i64) -> Self {
+        Self {
+            duration: chrono::Duration::minutes(minutes),
+        }
+    }
+
+    pub(crate) fn from_hours(hours: i64) -> Self {
+        Self {
+            duration: chrono::Duration::hours(hours),
+        }
     }
 }
 
@@ -57,6 +71,18 @@ impl Time {
     pub(crate) fn year(&self) -> u32 {
         self.time.year().try_into().unwrap()
     }
+
+    pub(crate) fn hour(&self) -> u32 {
+        self.time.hour()
+    }
+
+    pub(crate) fn minute(&self) -> u32 {
+        self.time.minute()
+    }
+
+    pub(crate) fn second(&self) -> u32 {
+        self.time.second()
+    }
 }
 
 impl From<&str> for Time {
@@ -70,16 +96,35 @@ impl From<&str> for Time {
 impl<'a, 'b> std::ops::Sub<&'b Time> for &'a Time {
     type Output = Duration;
     fn sub(self, other: &'b Time) -> Self::Output {
-        Duration(self.time - other.time)
+        Duration::new(self.time - other.time)
+    }
+}
+
+impl<'a, 'b> std::ops::Sub<&'b Duration> for &'a Time {
+    type Output = Time;
+    fn sub(self, other: &'b Duration) -> Self::Output {
+        let time = self
+            .time
+            .checked_sub_days(chrono::naive::Days::new(other.duration.num_days() as u64))
+            .unwrap();
+        Time::new(
+            time.day(),
+            time.month(),
+            time.year() as u32,
+            time.hour(),
+            time.minute(),
+            time.second(),
+        )
+        .unwrap()
     }
 }
 
 impl std::ops::Div<Self> for Duration {
     type Output = f32;
     fn div(self, rhs: Self) -> Self::Output {
-        match rhs.0.num_seconds() {
+        match rhs.duration.num_seconds() {
             0 => panic!(),
-            _ => self.0.num_seconds() as f32 / rhs.0.num_seconds() as f32,
+            _ => self.duration.num_seconds() as f32 / rhs.duration.num_seconds() as f32,
         }
     }
 }
@@ -140,24 +185,24 @@ mod tests {
         let before = Time::from("Sat, 21 Jan 2023 12:25:20 +0100");
         let after = Time::from("Sat, 21 Jan 2023 13:25:20 +0100");
         let duration_1 = &after - &before;
-        let duration_2 = Duration::new(60);
+        let duration_2 = Duration::from_minutes(60);
         assert_eq!(duration_1, duration_2);
     }
 
     #[test]
     fn duration_ratio() {
-        let duration_1 = Duration::new(30);
-        let duration_2 = Duration::new(15);
+        let duration_1 = Duration::from_minutes(30);
+        let duration_2 = Duration::from_minutes(15);
         let ratio = duration_1 / duration_2;
         assert!(float_cmp::approx_eq!(f32, ratio, 2.0));
 
-        let duration_1 = Duration::new(30);
-        let duration_2 = Duration::new(14);
+        let duration_1 = Duration::from_minutes(30);
+        let duration_2 = Duration::from_minutes(14);
         let ratio = duration_1 / duration_2;
         assert!(float_cmp::approx_eq!(f32, ratio, 2.142857));
 
-        let duration_1 = Duration::new(0);
-        let duration_2 = Duration::new(14);
+        let duration_1 = Duration::from_minutes(0);
+        let duration_2 = Duration::from_minutes(14);
         let ratio = duration_1 / duration_2;
         assert!(float_cmp::approx_eq!(f32, ratio, 0.));
     }
@@ -165,8 +210,8 @@ mod tests {
     #[test]
     #[should_panic]
     fn divide_by_zero_panics() {
-        let duration_1 = Duration::new(1);
-        let duration_2 = Duration::new(0);
+        let duration_1 = Duration::from_minutes(1);
+        let duration_2 = Duration::from_minutes(0);
         let _ = duration_1 / duration_2;
     }
 
