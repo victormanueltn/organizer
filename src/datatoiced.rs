@@ -14,11 +14,11 @@ impl ToIced for Data {
         let messages: Vec<_> = self
             .tasks
             .iter()
-            .filter(|task| {
+            .enumerate()
+            .filter(|(_, task)| {
                 (task.completed() && self.filters.complete)
                     || (task.visible_as_pending() && self.filters.todo)
             })
-            .enumerate()
             .map(|(index, task)| {
                 task.view()
                     .map(move |message| ListMessage::Task(index, message))
