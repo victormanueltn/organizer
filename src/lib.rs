@@ -38,42 +38,18 @@ struct SummaryDates {
 
 impl SummaryDates {
     fn new(
-        initial_day: u32,
-        initial_month: u32,
-        initial_year: u32,
-        initial_hour: u32,
-        initial_minute: u32,
-        initial_second: u32,
-        final_day: u32,
-        final_month: u32,
-        final_year: u32,
-        final_hour: u32,
-        final_minute: u32,
-        final_second: u32,
+        initial_date: &Time,
+        final_date: &Time,
     ) -> Self {
         SummaryDates {
-            initial_day,
-            initial_month,
-            initial_year,
-            initial_date: Time::new(
-                initial_day,
-                initial_month,
-                initial_year,
-                initial_hour,
-                initial_minute,
-                initial_second,
-            ),
-            final_day,
-            final_month,
-            final_year,
-            final_date: Time::new(
-                final_day,
-                final_month,
-                final_year,
-                final_hour,
-                final_minute,
-                final_second,
-            ),
+            initial_day: initial_date.day(),
+            initial_month: initial_date.month(),
+            initial_year: initial_date.year(),
+            initial_date: Ok(initial_date.clone()),
+            final_day: final_date.day(),
+            final_month: final_date.month(),
+            final_year: final_date.year(),
+            final_date: Ok(final_date.clone()),
         }
     }
 }

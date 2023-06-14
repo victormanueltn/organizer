@@ -371,56 +371,17 @@ impl SummaryView for Organizer {
             SummaryMessage::LastDay => {
                 let now = Time::now();
                 let before = &now - &Duration::from_hours(24);
-                self.summary_dates = SummaryDates::new(
-                    before.day(),
-                    before.month(),
-                    before.year(),
-                    before.hour(),
-                    before.minute(),
-                    before.second(),
-                    now.day(),
-                    now.month(),
-                    now.year(),
-                    now.hour(),
-                    now.minute(),
-                    now.second(),
-                );
+                self.summary_dates = SummaryDates::new(&before, &now);
             }
             SummaryMessage::LastWeek => {
                 let now = Time::now();
                 let before = &now - &Duration::from_hours(24 * 7);
-                self.summary_dates = SummaryDates::new(
-                    before.day(),
-                    before.month(),
-                    before.year(),
-                    before.hour(),
-                    before.minute(),
-                    before.second(),
-                    now.day(),
-                    now.month(),
-                    now.year(),
-                    now.hour(),
-                    now.minute(),
-                    now.second(),
-                );
+                self.summary_dates = SummaryDates::new(&before, &now);
             }
             SummaryMessage::LastTwoWeeks => {
                 let now = Time::now();
                 let before = &now - &Duration::from_hours(24 * 14);
-                self.summary_dates = SummaryDates::new(
-                    before.day(),
-                    before.month(),
-                    before.year(),
-                    before.hour(),
-                    before.minute(),
-                    before.second(),
-                    now.day(),
-                    now.month(),
-                    now.year(),
-                    now.hour(),
-                    now.minute(),
-                    now.second(),
-                );
+                self.summary_dates = SummaryDates::new(&before, &now);
             }
         }
     }
