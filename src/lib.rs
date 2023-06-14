@@ -36,6 +36,48 @@ struct SummaryDates {
     final_date: Result<Time, TimeError>,
 }
 
+impl SummaryDates {
+    fn new(
+        initial_day: u32,
+        initial_month: u32,
+        initial_year: u32,
+        initial_hour: u32,
+        initial_minute: u32,
+        initial_second: u32,
+        final_day: u32,
+        final_month: u32,
+        final_year: u32,
+        final_hour: u32,
+        final_minute: u32,
+        final_second: u32,
+    ) -> Self {
+        SummaryDates {
+            initial_day,
+            initial_month,
+            initial_year,
+            initial_date: Time::new(
+                initial_day,
+                initial_month,
+                initial_year,
+                initial_hour,
+                initial_minute,
+                initial_second,
+            ),
+            final_day,
+            final_month,
+            final_year,
+            final_date: Time::new(
+                final_day,
+                final_month,
+                final_year,
+                final_hour,
+                final_minute,
+                final_second,
+            ),
+        }
+    }
+}
+
 #[cfg(not(tarpaulin_include))]
 impl Sandbox for Organizer {
     type Message = Message;
