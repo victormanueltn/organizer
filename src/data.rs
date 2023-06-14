@@ -93,7 +93,7 @@ mod tests {
             },
         };
 
-        let file_name = "test_data.json";
+        let file_name = "test_data.ogz";
 
         data.save(file_name).unwrap();
         let loaded_data = Data::load(file_name).unwrap();
@@ -103,14 +103,14 @@ mod tests {
 
     #[test]
     fn load_inexistent_file() {
-        let loaded_data = Data::load("inexsistent.json");
+        let loaded_data = Data::load("inexsistent.ogz");
 
         assert!(matches!(loaded_data.unwrap_err().kind, FileErrorKind::Load));
     }
 
     #[test]
     fn load_invalid_file() {
-        let file_name = "test_invalid_data.json";
+        let file_name = "test_invalid_data.ogz";
         std::fs::write(file_name, "{\"tasks\":[{{\"id\":0,\"task_completed\":false,\"description\":\"\",\"state\":\"Idle\"}]}").unwrap();
 
         let loaded_data = Data::load(file_name);
@@ -131,7 +131,7 @@ mod tests {
             },
         };
 
-        let save_result = data.save("./inexistent_directory/data.json");
+        let save_result = data.save("./inexistent_directory/data.ogz");
 
         assert!(matches!(
             save_result.unwrap_err().kind,
