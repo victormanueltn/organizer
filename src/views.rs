@@ -124,7 +124,8 @@ impl ListView for Organizer {
                 self.file_name = Some(file_name);
             }
             ListMessage::Load => {
-                let loaded_data = Data::load(&self.file_name.clone().or(Some(String::new())).unwrap());
+                let loaded_data =
+                    Data::load(&self.file_name.clone().or(Some(String::new())).unwrap());
                 match loaded_data {
                     Ok(loaded_data) => self.data = loaded_data,
                     Err(error) => {
@@ -250,6 +251,7 @@ impl SummaryView for Organizer {
             self.data
                 .tasks
                 .iter()
+                .filter(|task| task.completed())
                 .filter(|task| task.completion_time.is_some())
                 .filter(|task| {
                     let completion_time = &task.completion_time.clone().unwrap();

@@ -39,6 +39,7 @@ impl Task {
         } else {
             &Time::now() - self.completion_time.as_ref().unwrap()
                 < Duration::from_minutes(FADE_OUT_TIME)
+                && self.task_completed
         }
     }
 
