@@ -126,7 +126,10 @@ impl Organizer {
     pub fn process_task_message(&mut self, task_id: usize, task_message: task::Message) {
         if let Some(a_task) = self.data.tasks.get_mut(task_id) {
             match task_message {
-                task::Message::ToggleTaskCompletion(completed) => a_task.set_completed(completed),
+                task::Message::ToggleTaskCompletion(completed) => {
+                    a_task.set_completed(completed);
+                    if completed { a_task.completion_time = None }
+                }
                 task::Message::TextInput(description) => a_task.edit(&description),
                 task::Message::DeleteTask => {
                     self.data.tasks.remove(task_id);

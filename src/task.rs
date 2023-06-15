@@ -36,10 +36,11 @@ impl Task {
     pub fn visible_as_pending(&self) -> bool {
         if !self.task_completed {
             true
-        } else {
-            &Time::now() - self.completion_time.as_ref().unwrap()
-                < Duration::from_minutes(FADE_OUT_TIME)
+        } else if let Some(completion_time) = self.completion_time.as_ref() {
+            &Time::now() - completion_time< Duration::from_minutes(FADE_OUT_TIME)
                 && self.task_completed
+        } else {
+            true
         }
     }
 
