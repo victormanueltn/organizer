@@ -10,7 +10,7 @@ use std::vec;
 
 use crate::toiced::add_button;
 use crate::views::{Message, ViewType};
-use data::{Data, Filters};
+use data::{Data, FileError, Filters};
 use iced::widget::Text;
 use iced::Element;
 use iced::Sandbox;
@@ -20,7 +20,7 @@ use time::{Time, TimeError};
 pub struct Organizer {
     data: Data,
     error_text: Option<String>,
-    file_name: String,
+    file_name: Option<String>,
     view_type: Option<ViewType>,
     summary_dates: SummaryDates,
 }
@@ -37,10 +37,7 @@ struct SummaryDates {
 }
 
 impl SummaryDates {
-    fn new(
-        initial_date: &Time,
-        final_date: &Time,
-    ) -> Self {
+    fn new(initial_date: &Time, final_date: &Time) -> Self {
         SummaryDates {
             initial_day: initial_date.day(),
             initial_month: initial_date.month(),
@@ -60,16 +57,33 @@ impl Sandbox for Organizer {
 
     fn new() -> Self {
         let today = Time::now();
-        Organizer {
-            data: Data {
+        let file_name = Organizer::search_for_file_in_working_directory();
+        let data = {
+            if let Some(file_name) = file_name.as_ref() {
+                Data::load(&file_name)
+            } else {
+                Err(FileError {
+                    message: "Invalid file".to_string(),
+                    kind: data::FileErrorKind::Load,
+                })
+            }
+        };
+
+        let data = match data {
+            Ok(data) => data,
+            Err(_) => Data {
                 tasks: vec![],
                 filters: Filters {
                     todo: true,
                     complete: false,
                 },
             },
+        };
+
+        Organizer {
+            data,
             error_text: None,
-            file_name: String::new(),
+            file_name,
             view_type: Some(ViewType::List),
             summary_dates: SummaryDates {
                 initial_day: 1,
@@ -119,6 +133,21 @@ impl Organizer {
                 }
             }
         }
+    }
+
+    pub(crate) fn search_for_file_in_working_directory() -> Option<String> {
+        let current_directory = std::env::current_dir().unwrap();
+
+        for entry in std::fs::read_dir(current_directory).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if let Some(extension) = path.extension() {
+                if extension == "ogz" {
+                    return Some(path.to_str().unwrap().to_string());
+                }
+            }
+        }
+        None
     }
 }
 

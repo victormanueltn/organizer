@@ -87,9 +87,10 @@ impl ListView for Organizer {
                 .align_items(iced::Alignment::Center);
         }
 
+        let file_name = &self.file_name.clone().or(Some(String::new())).unwrap();
         let file_name_input = iced::widget::text_input(
             "Name of the task list",
-            &self.file_name,
+            &file_name,
             ListMessage::UpdateSaveFileName,
         )
         .padding(10);
@@ -120,10 +121,10 @@ impl ListView for Organizer {
                 self.process_task_message(task_id, task_message)
             }
             ListMessage::UpdateSaveFileName(file_name) => {
-                self.file_name = file_name;
+                self.file_name = Some(file_name);
             }
             ListMessage::Load => {
-                let loaded_data = Data::load(&self.file_name);
+                let loaded_data = Data::load(&self.file_name.clone().or(Some(String::new())).unwrap());
                 match loaded_data {
                     Ok(loaded_data) => self.data = loaded_data,
                     Err(error) => {
@@ -133,7 +134,7 @@ impl ListView for Organizer {
                 }
             }
             ListMessage::Save => {
-                let save_result = self.data.save(&self.file_name);
+                let save_result = self.data.save(&self.file_name.as_ref().unwrap());
                 if let Err(error) = save_result {
                     self.error_text =
                         Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
