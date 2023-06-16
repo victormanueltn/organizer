@@ -115,6 +115,10 @@ impl Sandbox for Organizer {
             Message::ListViewMessage(message) => self.update_list_view(message),
             Message::SummaryViewMessage(message) => self.update_summary_view(message),
         }
+        let save_result = self.data.save(&self.file_name.as_ref().unwrap());
+        if let Err(_) = save_result {
+            self.error_text = Some(format!("Warning: Unsaved modifications."));
+        }
     }
 }
 
@@ -128,7 +132,9 @@ impl Organizer {
             match task_message {
                 task::Message::ToggleTaskCompletion(completed) => {
                     a_task.set_completed(completed);
-                    if completed { a_task.completion_time = None }
+                    if completed {
+                        a_task.completion_time = None
+                    }
                 }
                 task::Message::TextInput(description) => a_task.edit(&description),
                 task::Message::DeleteTask => {
