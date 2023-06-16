@@ -103,10 +103,11 @@ impl Sandbox for Organizer {
     }
 
     fn view(&self) -> Element<Message> {
-        match self.view_type.unwrap() {
+        let view = match self.view_type.unwrap() {
             ViewType::List => self.view_as_list().map(Message::ListViewMessage),
             ViewType::Summary => self.view_as_summary().map(Message::SummaryViewMessage),
-        }
+        };
+        iced::widget::scrollable(view).into()
     }
 
     fn update(&mut self, message: Message) {
