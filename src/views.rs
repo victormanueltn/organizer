@@ -135,7 +135,7 @@ impl ListView for Organizer {
                 }
             }
             ListMessage::Save => {
-                let save_result = self.data.save(&self.file_name.as_ref().unwrap());
+                let save_result = self.data.save(self.file_name.as_ref().unwrap());
                 if let Err(error) = save_result {
                     self.error_text =
                         Some(format!("{0:?} problem: {1:?}", error.kind, error.message));

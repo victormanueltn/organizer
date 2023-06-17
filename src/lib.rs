@@ -60,7 +60,7 @@ impl Sandbox for Organizer {
         let file_name = Organizer::search_for_file_in_working_directory();
         let data = {
             if let Some(file_name) = file_name.as_ref() {
-                Data::load(&file_name)
+                Data::load(file_name)
             } else {
                 Err(FileError {
                     message: "Invalid file".to_string(),
@@ -116,9 +116,9 @@ impl Sandbox for Organizer {
             Message::ListViewMessage(message) => self.update_list_view(message),
             Message::SummaryViewMessage(message) => self.update_summary_view(message),
         }
-        let save_result = self.data.save(&self.file_name.as_ref().unwrap());
-        if let Err(_) = save_result {
-            self.error_text = Some(format!("Warning: Unsaved modifications."));
+        let save_result = self.data.save(self.file_name.as_ref().unwrap());
+        if save_result.is_err() {
+            self.error_text = Some("Warning: Unsaved modifications.".to_string());
         }
     }
 }
@@ -133,7 +133,7 @@ impl Organizer {
             match task_message {
                 task::Message::ToggleTaskCompletion(completed) => {
                     a_task.set_completed(completed);
-                    if completed {
+                    if !completed {
                         a_task.completion_time = None
                     }
                 }
