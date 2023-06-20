@@ -41,6 +41,8 @@ pub enum ListMessage {
     Save,
     ToggleActiveFilter(bool),
     ToggleCompleteFilter(bool),
+    SwapWithPrevious,
+    SwapWithNext,
     SelectView(ViewType),
 }
 
@@ -147,6 +149,8 @@ impl ListView for Organizer {
             ListMessage::ToggleCompleteFilter(value) => {
                 self.data.filters.complete = value;
             }
+            ListMessage::SwapWithPrevious => {}
+            ListMessage::SwapWithNext => {}
             ListMessage::SelectView(value) => self.view_type = Some(value),
         }
     }

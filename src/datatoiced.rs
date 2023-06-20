@@ -9,9 +9,39 @@ use iced::{
 impl ToIced for Data {
     type Message = ListMessage;
     fn view(&self) -> Element<Self::Message> {
+        let up_and_down = [
+            iced::widget::Text::new("Up"),
+            iced::widget::Text::new("Down"),
+        ];
+
+        let mut up_and_down = up_and_down
+            .into_iter()
+            .map(|text| {
+                text.width(iced::Length::try_from(10).unwrap())
+                    .height(6)
+                    .horizontal_alignment(iced::alignment::Horizontal::Center)
+                    .vertical_alignment(iced::alignment::Vertical::Center)
+                    .size(10)
+            })
+            .collect::<Vec<iced::widget::Text>>();
+
+        let up_button = {
+            button(up_and_down.remove(0))
+                .on_press(ListMessage::SwapWithPrevious)
+                .padding(10)
+        };
+
+        let down_button = {
+            button(up_and_down.remove(0))
+                .on_press(ListMessage::SwapWithPrevious)
+                .padding(10)
+        };
+
+        let up_and_down = column!(up_button, down_button);
+
         let mut a_column = column(vec![]);
 
-        let messages: Vec<_> = self
+        let messages = self
             .tasks
             .iter()
             .enumerate()
@@ -23,7 +53,7 @@ impl ToIced for Data {
                 task.view()
                     .map(move |message| ListMessage::Task(index, message))
             })
-            .collect();
+            .collect::<Vec<_>>();
 
         for message in messages {
             a_column = a_column.push(message);
