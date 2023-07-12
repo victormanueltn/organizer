@@ -89,10 +89,10 @@ impl ListView for Organizer {
                 .align_items(iced::Alignment::Center);
         }
 
-        let file_name = &self.file_name.clone().or(Some(String::new())).unwrap();
+        let file_name = &self.file_name.clone().unwrap_or(String::new());
         let file_name_input = iced::widget::text_input(
             "Name of the task list",
-            &file_name,
+            file_name,
             ListMessage::UpdateSaveFileName,
         )
         .padding(10);
@@ -127,7 +127,7 @@ impl ListView for Organizer {
             }
             ListMessage::Load => {
                 let loaded_data =
-                    Data::load(&self.file_name.clone().or(Some(String::new())).unwrap());
+                    Data::load(&self.file_name.clone().unwrap_or(String::new()));
                 match loaded_data {
                     Ok(loaded_data) => self.data = loaded_data,
                     Err(error) => {
