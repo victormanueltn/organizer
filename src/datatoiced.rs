@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use crate::views::ListMessage;
 use crate::{data::Data, toiced::ToIced};
 use iced::{
@@ -9,35 +11,37 @@ use iced::{
 impl ToIced for Data {
     type Message = ListMessage;
     fn view(&self) -> Element<Self::Message> {
-        let up_and_down = [
-            iced::widget::Text::new("Up"),
-            iced::widget::Text::new("Down"),
-        ];
+        let create_swap_buttons = |index| {
+            let up_and_down = [
+                iced::widget::Text::new("Up"),
+                iced::widget::Text::new("Down"),
+            ];
 
-        let mut up_and_down = up_and_down
-            .into_iter()
-            .map(|text| {
-                text.width(iced::Length::try_from(10).unwrap())
-                    .height(6)
-                    .horizontal_alignment(iced::alignment::Horizontal::Center)
-                    .vertical_alignment(iced::alignment::Vertical::Center)
-                    .size(10)
-            })
-            .collect::<Vec<iced::widget::Text>>();
+            let mut up_and_down = up_and_down
+                .into_iter()
+                .map(|text| {
+                    text.width(iced::Length::try_from(10).unwrap())
+                        .height(6)
+                        .horizontal_alignment(iced::alignment::Horizontal::Center)
+                        .vertical_alignment(iced::alignment::Vertical::Center)
+                        .size(10)
+                })
+                .collect::<Vec<iced::widget::Text>>();
 
-        let up_button = {
-            button(up_and_down.remove(0))
-                .on_press(ListMessage::SwapWithPrevious)
-                .padding(10)
+            let up_button = {
+                button(up_and_down.remove(0))
+                    .on_press(ListMessage::SwapWithPrevious)
+                    .padding(10)
+            };
+
+            let down_button = {
+                button(up_and_down.remove(0))
+                    .on_press(ListMessage::SwapWithNext)
+                    .padding(10)
+            };
+
+            column!(up_button, down_button)
         };
-
-        let down_button = {
-            button(up_and_down.remove(0))
-                .on_press(ListMessage::SwapWithPrevious)
-                .padding(10)
-        };
-
-        let up_and_down = column!(up_button, down_button);
 
         let mut a_column = column(vec![]);
 
@@ -55,8 +59,14 @@ impl ToIced for Data {
             })
             .collect::<Vec<_>>();
 
-        for message in messages {
-            a_column = a_column.push(message);
+        let tasks = messages
+            .into_iter()
+            .enumerate()
+            .map(|(index, task)| iced::widget::row![create_swap_buttons(index), task])
+            .collect::<VecDeque<_>>();
+
+        for task in tasks {
+            a_column = a_column.push(task);
         }
 
         a_column = add_task_button(a_column)
