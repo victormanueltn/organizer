@@ -2,7 +2,7 @@ use crate::tasktoiced::FADE_OUT_TIME;
 use crate::time::{Duration, Time};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Clone,Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct Task {
     pub id: usize,
     task_completed: bool,

@@ -41,8 +41,8 @@ pub enum ListMessage {
     Save,
     ToggleActiveFilter(bool),
     ToggleCompleteFilter(bool),
-    SwapWithPrevious,
-    SwapWithNext,
+    SwapWithPrevious(usize),
+    SwapWithNext(usize),
     SelectView(ViewType),
 }
 
@@ -126,8 +126,7 @@ impl ListView for Organizer {
                 self.file_name = Some(file_name);
             }
             ListMessage::Load => {
-                let loaded_data =
-                    Data::load(&self.file_name.clone().unwrap_or(String::new()));
+                let loaded_data = Data::load(&self.file_name.clone().unwrap_or(String::new()));
                 match loaded_data {
                     Ok(loaded_data) => self.data = loaded_data,
                     Err(error) => {
@@ -149,8 +148,25 @@ impl ListView for Organizer {
             ListMessage::ToggleCompleteFilter(value) => {
                 self.data.filters.complete = value;
             }
-            ListMessage::SwapWithPrevious => {}
-            ListMessage::SwapWithNext => {}
+            ListMessage::SwapWithPrevious(index) => {
+                let first_visible = index == 0;
+                if !first_visible {
+                    let visible_tasks = self.data.visible_tasks();
+                    let (current_index, _) = visible_tasks[index];
+                    let (previous_index, _) = visible_tasks[index - 1];
+                    self.data.tasks.swap(current_index, previous_index);
+                }
+            }
+            ListMessage::SwapWithNext(index) => {
+                let visible_tasks = self.data.visible_tasks();
+                let last_visible = index + 1 == visible_tasks.len();
+                if !last_visible {
+                    let (current_index, _) = visible_tasks[index];
+                    let (next_index, _) = visible_tasks[index + 1];
+                    self.data.tasks.swap(current_index, next_index);
+                }
+            }
+
             ListMessage::SelectView(value) => self.view_type = Some(value),
         }
     }

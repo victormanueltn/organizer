@@ -55,6 +55,19 @@ impl Data {
         Ok(data)
     }
 
+    pub(crate) fn visible_tasks(&self) -> Vec<(usize, &Task)> {
+        let visible_tasks: Vec<(usize, &Task)> = self
+            .tasks
+            .iter()
+            .enumerate()
+            .filter(|(_, task)| {
+                (task.completed() && self.filters.complete)
+                    || (task.visible_as_pending() && self.filters.todo)
+            })
+            .collect::<Vec<_>>();
+        visible_tasks
+    }
+
     fn add_extension_if_missing(file_name: &str) -> Result<String, FileError> {
         let extension = std::path::Path::new(file_name).extension();
         let mut file_name = file_name.to_string();

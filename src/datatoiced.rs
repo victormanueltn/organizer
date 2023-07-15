@@ -26,17 +26,17 @@ impl ToIced for Data {
                         .vertical_alignment(iced::alignment::Vertical::Center)
                         .size(10)
                 })
-                .collect::<Vec<iced::widget::Text>>();
+                .collect::<VecDeque<iced::widget::Text>>();
 
             let up_button = {
-                button(up_and_down.remove(0))
-                    .on_press(ListMessage::SwapWithPrevious)
+                button(up_and_down.pop_front().unwrap())
+                    .on_press(ListMessage::SwapWithPrevious(index))
                     .padding(10)
             };
 
             let down_button = {
-                button(up_and_down.remove(0))
-                    .on_press(ListMessage::SwapWithNext)
+                button(up_and_down.pop_front().unwrap())
+                    .on_press(ListMessage::SwapWithNext(index))
                     .padding(10)
             };
 
@@ -46,14 +46,9 @@ impl ToIced for Data {
         let mut a_column = column(vec![]);
 
         let messages = self
-            .tasks
-            .iter()
-            .enumerate()
-            .filter(|(_, task)| {
-                (task.completed() && self.filters.complete)
-                    || (task.visible_as_pending() && self.filters.todo)
-            })
-            .map(|(index, task)| {
+            .visible_tasks()
+            .into_iter()
+            .map(move |(index, task)| {
                 task.view()
                     .map(move |message| ListMessage::Task(index, message))
             })
