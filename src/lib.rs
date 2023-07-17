@@ -15,7 +15,7 @@ use iced::widget::Text;
 use iced::Element;
 use iced::Sandbox;
 use task::Task;
-use time::{Time, TimeError};
+use time::{Duration, Time, TimeError};
 
 pub struct Organizer {
     data: Data,
@@ -56,7 +56,6 @@ impl Sandbox for Organizer {
     type Message = Message;
 
     fn new() -> Self {
-        let today = Time::now();
         let file_name = Organizer::search_for_file_in_working_directory();
         let data = {
             if let Some(file_name) = file_name.as_ref() {
@@ -80,21 +79,14 @@ impl Sandbox for Organizer {
             },
         };
 
+        let now = Time::now();
+        let before = &now - &Duration::from_hours(24);
         Organizer {
             data,
             error_text: None,
             file_name,
             view_type: Some(ViewType::List),
-            summary_dates: SummaryDates {
-                initial_day: 1,
-                initial_month: 1,
-                initial_year: 2023,
-                initial_date: Time::new(1, 1, 2023, 0, 0, 0),
-                final_day: today.day(),
-                final_month: today.month(),
-                final_year: today.year(),
-                final_date: Time::new(today.day(), today.month(), today.year(), 0, 0, 0),
-            },
+            summary_dates: SummaryDates::new(&before, &now),
         }
     }
 
