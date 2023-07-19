@@ -14,7 +14,11 @@ pub enum ViewType {
 }
 
 impl ViewType {
-    pub const ALL: [ViewType; 3] = [ViewType::List, ViewType::Summary, ViewType::PeriodicTasksManagement];
+    pub const ALL: [ViewType; 3] = [
+        ViewType::List,
+        ViewType::Summary,
+        ViewType::PeriodicTasksManagement,
+    ];
 }
 
 impl std::fmt::Display for ViewType {

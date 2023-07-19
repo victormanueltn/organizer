@@ -1,7 +1,7 @@
 mod data;
 use crate::views::list_view::ListView;
-use crate::views::summary_view::SummaryView;
 use crate::views::periodic_tasks_management::PeriodicTasksManagementView;
+use crate::views::summary_view::SummaryView;
 mod datatoiced;
 mod fonts;
 mod task;
