@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 
+use crate::views::fonts::{downwards_arrow, upwards_arrow};
 use crate::views::ListMessage;
 use crate::{data::Data, toiced::ToIced};
 use iced::{
@@ -12,10 +13,7 @@ impl ToIced for Data {
     type Message = ListMessage;
     fn view(&self) -> Element<Self::Message> {
         let create_swap_buttons = |index| {
-            let up_and_down = [
-                iced::widget::Text::new("Up"),
-                iced::widget::Text::new("Down"),
-            ];
+            let up_and_down = [upwards_arrow(), downwards_arrow()];
 
             let mut up_and_down = up_and_down
                 .into_iter()
