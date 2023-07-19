@@ -1,5 +1,6 @@
 mod data;
-use crate::views::{ListView, SummaryView};
+use crate::views::list_view::ListView;
+use crate::views::summary_view::SummaryView;
 mod datatoiced;
 mod fonts;
 mod task;

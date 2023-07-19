@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::fonts::icons::{downwards_arrow, upwards_arrow};
-use crate::views::ListMessage;
+use crate::views::list_view::ListMessage;
 use crate::{data::Data, toiced::ToIced};
 use iced::{
     alignment,
