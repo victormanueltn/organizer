@@ -1,6 +1,7 @@
 mod data;
 use crate::views::list_view::ListView;
 use crate::views::summary_view::SummaryView;
+use crate::views::periodic_tasks_management::PeriodicTasksManagementView;
 mod datatoiced;
 mod fonts;
 mod task;
@@ -100,6 +101,9 @@ impl Sandbox for Organizer {
         let view = match self.view_type.unwrap() {
             ViewType::List => self.view_as_list().map(Message::ListViewMessage),
             ViewType::Summary => self.view_as_summary().map(Message::SummaryViewMessage),
+            ViewType::PeriodicTasksManagement => self
+                .view_as_periodic_tasks_manager()
+                .map(Message::PeriodicTasksManagementViewMessage),
         };
         iced::widget::scrollable(view).into()
     }
@@ -109,6 +113,9 @@ impl Sandbox for Organizer {
         match message {
             Message::ListViewMessage(message) => self.update_list_view(message),
             Message::SummaryViewMessage(message) => self.update_summary_view(message),
+            Message::PeriodicTasksManagementViewMessage(message) => {
+                self.update_periodic_tasks_manager(message)
+            }
         }
         let save_result = self.data.save(self.file_name.as_ref().unwrap());
         if save_result.is_err() {
