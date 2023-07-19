@@ -1,6 +1,7 @@
 mod data;
 use crate::views::{ListView, SummaryView};
 mod datatoiced;
+mod fonts;
 mod task;
 mod tasktoiced;
 mod time;

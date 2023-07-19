@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::views::fonts::{downwards_arrow, upwards_arrow};
+use crate::fonts::icons::{downwards_arrow, upwards_arrow};
 use crate::views::ListMessage;
 use crate::{data::Data, toiced::ToIced};
 use iced::{
