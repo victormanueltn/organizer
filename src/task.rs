@@ -2,7 +2,7 @@ use crate::tasktoiced::FADE_OUT_TIME;
 use crate::time::{Duration, Time};
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone,Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct Task {
     pub id: usize,
     task_completed: bool,
@@ -37,7 +37,7 @@ impl Task {
         if !self.task_completed {
             true
         } else if let Some(completion_time) = self.completion_time.as_ref() {
-            &Time::now() - completion_time< Duration::from_minutes(FADE_OUT_TIME)
+            &Time::now() - completion_time < Duration::from_minutes(FADE_OUT_TIME)
                 && self.task_completed
         } else {
             true

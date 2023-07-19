@@ -71,7 +71,6 @@ impl Time {
     pub(crate) fn year(&self) -> u32 {
         self.time.year().try_into().unwrap()
     }
-
 }
 
 impl From<&str> for Time {
