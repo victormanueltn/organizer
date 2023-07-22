@@ -24,11 +24,8 @@ pub(crate) trait SummaryView {
 
 impl SummaryView for Organizer {
     fn view_as_summary(&self) -> iced::Element<Message> {
-        let view_pick_list = iced::widget::pick_list(
-            &ViewType::ALL[..],
-            self.view_type,
-            Message::SelectView,
-        );
+        let view_pick_list =
+            iced::widget::pick_list(&ViewType::ALL[..], self.view_type, Message::SelectView);
 
         let pick_list_row = iced::widget::row!(view_pick_list).spacing(10).padding(10);
 
@@ -41,28 +38,19 @@ impl SummaryView for Organizer {
                 .padding(10);
 
         let initial_day = self.summary_dates.initial_day.to_string();
-        let initial_day_input = iced::widget::text_input(
-            "Initial day",
-            &initial_day,
-            Message::UpdateInitialDay,
-        )
-        .padding(10);
+        let initial_day_input =
+            iced::widget::text_input("Initial day", &initial_day, Message::UpdateInitialDay)
+                .padding(10);
 
         let initial_month = self.summary_dates.initial_month.to_string();
-        let initial_month_input = iced::widget::text_input(
-            "Initial month",
-            &initial_month,
-            Message::UpdateInitialMonth,
-        )
-        .padding(10);
+        let initial_month_input =
+            iced::widget::text_input("Initial month", &initial_month, Message::UpdateInitialMonth)
+                .padding(10);
 
         let initial_year = self.summary_dates.initial_year.to_string();
-        let initial_year_input = iced::widget::text_input(
-            "Initial year",
-            &initial_year,
-            Message::UpdateInitialYear,
-        )
-        .padding(10);
+        let initial_year_input =
+            iced::widget::text_input("Initial year", &initial_year, Message::UpdateInitialYear)
+                .padding(10);
         let initial_date_row =
             iced::widget::row![initial_day_input, initial_month_input, initial_year_input];
 
@@ -80,16 +68,12 @@ impl SummaryView for Organizer {
 
         let final_day = self.summary_dates.final_day.to_string();
         let final_day_input =
-            iced::widget::text_input("Final day", &final_day, Message::UpdateFinalDay)
-                .padding(10);
+            iced::widget::text_input("Final day", &final_day, Message::UpdateFinalDay).padding(10);
 
         let final_month = self.summary_dates.final_month.to_string();
-        let final_month_input = iced::widget::text_input(
-            "Initial month",
-            &final_month,
-            Message::UpdateFinalMonth,
-        )
-        .padding(10);
+        let final_month_input =
+            iced::widget::text_input("Initial month", &final_month, Message::UpdateFinalMonth)
+                .padding(10);
 
         let final_year = self.summary_dates.final_year.to_string();
         let final_year_input =

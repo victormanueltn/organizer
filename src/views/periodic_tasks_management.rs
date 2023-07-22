@@ -12,11 +12,8 @@ pub(crate) trait PeriodicTasksManagementView {
 
 impl PeriodicTasksManagementView for Organizer {
     fn view_as_periodic_tasks_manager(&self) -> iced::Element<Message> {
-        let view_pick_list = iced::widget::pick_list(
-            &ViewType::ALL[..],
-            self.view_type,
-            Message::SelectView,
-        );
+        let view_pick_list =
+            iced::widget::pick_list(&ViewType::ALL[..], self.view_type, Message::SelectView);
 
         let mut a_column = iced::widget::column(vec![]);
 
