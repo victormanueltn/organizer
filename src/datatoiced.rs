@@ -75,12 +75,12 @@ fn add_task_button(a_column: Column<Message>) -> Column<Message> {
         .width(Length::try_from(120).unwrap())
         .horizontal_alignment(alignment::Horizontal::Center)
         .size(20);
-    let edit_button = button(create_task_text)
+    let crete_task_button = button(create_task_text)
         .on_press(Message::AddTask)
         .padding(10);
 
     a_column
         .spacing(20)
         .align_items(iced::Alignment::Center)
-        .push(edit_button)
+        .push(crete_task_button)
 }

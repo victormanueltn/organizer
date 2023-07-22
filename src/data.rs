@@ -1,9 +1,11 @@
+use crate::periodic_task::PeriodicTask;
 use crate::task::Task;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub(crate) struct Data {
     pub(crate) tasks: Vec<Task>,
+    pub(crate) periodic_tasks: Vec<PeriodicTask>,
     pub(crate) filters: Filters,
 }
 

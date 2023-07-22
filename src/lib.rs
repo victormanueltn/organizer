@@ -4,6 +4,7 @@ use crate::views::periodic_tasks_management::PeriodicTasksManagementView;
 use crate::views::summary_view::SummaryView;
 mod datatoiced;
 mod fonts;
+mod periodic_task;
 mod task;
 mod tasktoiced;
 mod time;
@@ -75,6 +76,7 @@ impl Sandbox for Organizer {
             Ok(data) => data,
             Err(_) => Data {
                 tasks: vec![],
+                periodic_tasks: vec![],
                 filters: Filters {
                     todo: true,
                     complete: false,
