@@ -27,4 +27,8 @@ impl PeriodicTasksManagementView for Organizer {
             Message::SelectView(value) => self.view_type = Some(value),
         }
     }
+
+
+    // - Initial date (and time?)
+    // - Frequency (x times per day/week/month/year)
 }
