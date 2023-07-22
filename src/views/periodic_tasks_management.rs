@@ -53,12 +53,15 @@ impl PeriodicTasksManagementView for Organizer {
     fn update_periodic_tasks_manager(&mut self, message: Message) {
         match message {
             Message::SelectView(value) => self.view_type = Some(value),
-            Message::Create => self.data.periodic_tasks.push(PeriodicTask::new(
-                "".to_string(),
-                Time::now(),
-                std::usize::MAX,
-            )),
-            Message::PeriodicTask(_, _) => (),
+            Message::Create => {
+                self.data
+                    .periodic_tasks
+                    .push(PeriodicTask::new("".to_string(), Time::now(), None))
+            }
+            Message::PeriodicTask(index, message) => match message {
+                periodic_task::Message::DeleteTask => _ = self.data.periodic_tasks.remove(index),
+                _ => self.data.periodic_tasks[index].update(message),
+            },
         }
     }
 }
