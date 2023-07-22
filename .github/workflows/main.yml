@@ -65,7 +65,7 @@ jobs:
 
       - name: Run code coverage
         run: |
-          cargo +nightly tarpaulin --ignore-tests --exclude-files *src/lib.rs *toiced.rs --fail-under 85 --out Html  --rustflags="-C opt-level=0"
+          cargo +nightly tarpaulin --ignore-tests --exclude-files *src/lib.rs *toiced.rs *src/views *src/views/*.rs --fail-under 85 --out Html  --rustflags="-C opt-level=0"
       
       - name: Upload test coverage output
         if: ${{ failure() }}
