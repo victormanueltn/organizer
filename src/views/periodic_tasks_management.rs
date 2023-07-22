@@ -1,21 +1,21 @@
 use crate::{Organizer, ViewType};
 
 #[derive(Debug, Clone)]
-pub enum PeriodicTasksManagementMessage {
+pub enum Message {
     SelectView(ViewType),
 }
 
 pub(crate) trait PeriodicTasksManagementView {
-    fn view_as_periodic_tasks_manager(&self) -> iced::Element<PeriodicTasksManagementMessage>;
-    fn update_periodic_tasks_manager(&mut self, message: PeriodicTasksManagementMessage);
+    fn view_as_periodic_tasks_manager(&self) -> iced::Element<Message>;
+    fn update_periodic_tasks_manager(&mut self, message: Message);
 }
 
 impl PeriodicTasksManagementView for Organizer {
-    fn view_as_periodic_tasks_manager(&self) -> iced::Element<PeriodicTasksManagementMessage> {
+    fn view_as_periodic_tasks_manager(&self) -> iced::Element<Message> {
         let view_pick_list = iced::widget::pick_list(
             &ViewType::ALL[..],
             self.view_type,
-            PeriodicTasksManagementMessage::SelectView,
+            Message::SelectView,
         );
 
         let mut a_column = iced::widget::column(vec![]);
@@ -25,9 +25,9 @@ impl PeriodicTasksManagementView for Organizer {
         a_column.into()
     }
 
-    fn update_periodic_tasks_manager(&mut self, message: PeriodicTasksManagementMessage) {
+    fn update_periodic_tasks_manager(&mut self, message: Message) {
         match message {
-            PeriodicTasksManagementMessage::SelectView(value) => self.view_type = Some(value),
+            Message::SelectView(value) => self.view_type = Some(value),
         }
     }
 }

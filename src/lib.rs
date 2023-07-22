@@ -99,11 +99,11 @@ impl Sandbox for Organizer {
 
     fn view(&self) -> Element<Message> {
         let view = match self.view_type.unwrap() {
-            ViewType::List => self.view_as_list().map(Message::ListViewMessage),
-            ViewType::Summary => self.view_as_summary().map(Message::SummaryViewMessage),
+            ViewType::List => self.view_as_list().map(Message::List),
+            ViewType::Summary => self.view_as_summary().map(Message::Summary),
             ViewType::PeriodicTasksManagement => self
                 .view_as_periodic_tasks_manager()
-                .map(Message::PeriodicTasksManagementViewMessage),
+                .map(Message::PeriodicTasksManagement),
         };
         iced::widget::scrollable(view).into()
     }
@@ -111,9 +111,9 @@ impl Sandbox for Organizer {
     fn update(&mut self, message: Message) {
         self.error_text = None;
         match message {
-            Message::ListViewMessage(message) => self.update_list_view(message),
-            Message::SummaryViewMessage(message) => self.update_summary_view(message),
-            Message::PeriodicTasksManagementViewMessage(message) => {
+            Message::List(message) => self.update_list_view(message),
+            Message::Summary(message) => self.update_summary_view(message),
+            Message::PeriodicTasksManagement(message) => {
                 self.update_periodic_tasks_manager(message)
             }
         }
@@ -261,7 +261,7 @@ mod tests {
         #[test]
         fn add_task() {
             let mut organizer = Organizer::new();
-            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
+            organizer.update(Message::List(ListMessage::AddTask));
             assert_eq!(organizer.data.tasks.len(), 1);
         }
 
@@ -269,9 +269,9 @@ mod tests {
         #[should_panic]
         fn message_to_inexisting_task() {
             let mut organizer = Organizer::new();
-            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
+            organizer.update(Message::List(ListMessage::AddTask));
 
-            organizer.update(Message::ListViewMessage(ListMessage::Task(
+            organizer.update(Message::List(ListMessage::Task(
                 1,
                 task::Message::DeleteTask,
             )));
@@ -282,25 +282,25 @@ mod tests {
         fn task_message() {
             let mut organizer = Organizer::new();
 
-            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
-            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
-            organizer.update(Message::ListViewMessage(ListMessage::AddTask));
+            organizer.update(Message::List(ListMessage::AddTask));
+            organizer.update(Message::List(ListMessage::AddTask));
+            organizer.update(Message::List(ListMessage::AddTask));
             assert_eq!(organizer.data.tasks.len(), 3);
 
-            organizer.update(Message::ListViewMessage(ListMessage::Task(
+            organizer.update(Message::List(ListMessage::Task(
                 0,
                 task::Message::TextInput("A".to_string()),
             )));
-            organizer.update(Message::ListViewMessage(ListMessage::Task(
+            organizer.update(Message::List(ListMessage::Task(
                 1,
                 task::Message::TextInput("B".to_string()),
             )));
-            organizer.update(Message::ListViewMessage(ListMessage::Task(
+            organizer.update(Message::List(ListMessage::Task(
                 2,
                 task::Message::TextInput("C".to_string()),
             )));
 
-            organizer.update(Message::ListViewMessage(ListMessage::Task(
+            organizer.update(Message::List(ListMessage::Task(
                 1,
                 task::Message::DeleteTask,
             )));

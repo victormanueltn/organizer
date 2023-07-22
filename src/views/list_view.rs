@@ -4,7 +4,7 @@ use crate::{add_button, task, Organizer};
 use crate::{Data, Text};
 
 #[derive(Debug, Clone)]
-pub enum ListMessage {
+pub enum Message {
     AddTask,
     Task(usize, task::Message),
     Load,
@@ -18,21 +18,21 @@ pub enum ListMessage {
 }
 
 pub(crate) trait ListView {
-    fn view_as_list(&self) -> iced::Element<ListMessage>;
-    fn update_list_view(&mut self, message: ListMessage);
+    fn view_as_list(&self) -> iced::Element<Message>;
+    fn update_list_view(&mut self, message: Message);
 }
 
 impl ListView for Organizer {
-    fn view_as_list(&self) -> iced::Element<ListMessage> {
+    fn view_as_list(&self) -> iced::Element<Message> {
         let button_todo_tasks = iced::widget::Checkbox::new(
             "Todo",
             self.data.filters.todo,
-            ListMessage::ToggleActiveFilter,
+            Message::ToggleActiveFilter,
         );
         let button_complete_tasks = iced::widget::Checkbox::new(
             "Complete",
             self.data.filters.complete,
-            ListMessage::ToggleCompleteFilter,
+            Message::ToggleCompleteFilter,
         );
 
         let a_row = iced::widget::row![button_todo_tasks, button_complete_tasks].spacing(40);
@@ -50,17 +50,17 @@ impl ListView for Organizer {
         let file_name_input = iced::widget::text_input(
             "Name of the task list",
             file_name,
-            ListMessage::UpdateSaveFileName,
+            Message::UpdateSaveFileName,
         )
         .padding(10);
-        let load_button = add_button("Save task list", ListMessage::Save);
-        let save_button = add_button("Load task list", ListMessage::Load);
+        let load_button = add_button("Save task list", Message::Save);
+        let save_button = add_button("Load task list", Message::Load);
         let a_row = iced::widget::row!(file_name_input, save_button, load_button)
             .spacing(10)
             .padding(10);
 
         let view_pick_list =
-            iced::widget::pick_list(&ViewType::ALL[..], self.view_type, ListMessage::SelectView);
+            iced::widget::pick_list(&ViewType::ALL[..], self.view_type, Message::SelectView);
 
         a_column
             .push(a_row)
@@ -70,19 +70,19 @@ impl ListView for Organizer {
             .into()
     }
 
-    fn update_list_view(&mut self, message: ListMessage) {
+    fn update_list_view(&mut self, message: Message) {
         match message {
-            ListMessage::AddTask => self.add_task(),
-            ListMessage::Task(task_id, task_message) => {
+            Message::AddTask => self.add_task(),
+            Message::Task(task_id, task_message) => {
                 if task_id > self.data.tasks.len() {
                     panic!("Tried to update inexisting task.")
                 };
                 self.process_task_message(task_id, task_message)
             }
-            ListMessage::UpdateSaveFileName(file_name) => {
+            Message::UpdateSaveFileName(file_name) => {
                 self.file_name = Some(file_name);
             }
-            ListMessage::Load => {
+            Message::Load => {
                 let loaded_data = Data::load(&self.file_name.clone().unwrap_or(String::new()));
                 match loaded_data {
                     Ok(loaded_data) => self.data = loaded_data,
@@ -92,20 +92,20 @@ impl ListView for Organizer {
                     }
                 }
             }
-            ListMessage::Save => {
+            Message::Save => {
                 let save_result = self.data.save(self.file_name.as_ref().unwrap());
                 if let Err(error) = save_result {
                     self.error_text =
                         Some(format!("{0:?} problem: {1:?}", error.kind, error.message));
                 }
             }
-            ListMessage::ToggleActiveFilter(value) => {
+            Message::ToggleActiveFilter(value) => {
                 self.data.filters.todo = value;
             }
-            ListMessage::ToggleCompleteFilter(value) => {
+            Message::ToggleCompleteFilter(value) => {
                 self.data.filters.complete = value;
             }
-            ListMessage::SwapWithPrevious(index) => {
+            Message::SwapWithPrevious(index) => {
                 let first_visible = index == 0;
                 if !first_visible {
                     let visible_tasks = self.data.visible_tasks();
@@ -114,7 +114,7 @@ impl ListView for Organizer {
                     self.data.tasks.swap(current_index, previous_index);
                 }
             }
-            ListMessage::SwapWithNext(index) => {
+            Message::SwapWithNext(index) => {
                 let visible_tasks = self.data.visible_tasks();
                 let last_visible = index + 1 == visible_tasks.len();
                 if !last_visible {
@@ -124,7 +124,7 @@ impl ListView for Organizer {
                 }
             }
 
-            ListMessage::SelectView(value) => self.view_type = Some(value),
+            Message::SelectView(value) => self.view_type = Some(value),
         }
     }
 }

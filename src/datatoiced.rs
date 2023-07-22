@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::fonts::icons::{downwards_arrow, upwards_arrow};
-use crate::views::list_view::ListMessage;
+use crate::views::list_view::Message;
 use crate::{data::Data, toiced::ToIced};
 use iced::{
     alignment,
@@ -10,7 +10,7 @@ use iced::{
 };
 
 impl ToIced for Data {
-    type Message = ListMessage;
+    type Message = Message;
     fn view(&self) -> Element<Self::Message> {
         let create_swap_buttons = |index| {
             let up_and_down = [upwards_arrow(), downwards_arrow()];
@@ -28,13 +28,13 @@ impl ToIced for Data {
 
             let up_button = {
                 button(up_and_down.pop_front().unwrap())
-                    .on_press(ListMessage::SwapWithPrevious(index))
+                    .on_press(Message::SwapWithPrevious(index))
                     .padding(10)
             };
 
             let down_button = {
                 button(up_and_down.pop_front().unwrap())
-                    .on_press(ListMessage::SwapWithNext(index))
+                    .on_press(Message::SwapWithNext(index))
                     .padding(10)
             };
 
@@ -48,7 +48,7 @@ impl ToIced for Data {
             .into_iter()
             .map(move |(index, task)| {
                 task.view()
-                    .map(move |message| ListMessage::Task(index, message))
+                    .map(move |message| Message::Task(index, message))
             })
             .collect::<Vec<_>>();
 
@@ -70,13 +70,13 @@ impl ToIced for Data {
     }
 }
 
-fn add_task_button(a_column: Column<ListMessage>) -> Column<ListMessage> {
+fn add_task_button(a_column: Column<Message>) -> Column<Message> {
     let create_task_text = Text::new("Add a new task")
         .width(Length::try_from(120).unwrap())
         .horizontal_alignment(alignment::Horizontal::Center)
         .size(20);
     let edit_button = button(create_task_text)
-        .on_press(ListMessage::AddTask)
+        .on_press(Message::AddTask)
         .padding(10);
 
     a_column

@@ -2,10 +2,6 @@ pub(crate) mod list_view;
 pub(crate) mod periodic_tasks_management;
 pub(crate) mod summary_view;
 
-use crate::views::list_view::ListMessage;
-use crate::views::periodic_tasks_management::PeriodicTasksManagementMessage;
-use crate::views::summary_view::SummaryMessage;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ViewType {
     List,
@@ -37,7 +33,7 @@ impl std::fmt::Display for ViewType {
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    ListViewMessage(ListMessage),
-    SummaryViewMessage(SummaryMessage),
-    PeriodicTasksManagementViewMessage(PeriodicTasksManagementMessage),
+    List(list_view::Message),
+    Summary(summary_view::Message),
+    PeriodicTasksManagement(periodic_tasks_management::Message),
 }
