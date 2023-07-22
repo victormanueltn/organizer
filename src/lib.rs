@@ -256,12 +256,12 @@ mod tests {
 
     mod update {
         use super::*;
-        use crate::views::ListMessage;
+        use crate::views::list_view;
 
         #[test]
         fn add_task() {
             let mut organizer = Organizer::new();
-            organizer.update(Message::List(ListMessage::AddTask));
+            organizer.update(Message::List(list_view::Message::AddTask));
             assert_eq!(organizer.data.tasks.len(), 1);
         }
 
@@ -269,9 +269,9 @@ mod tests {
         #[should_panic]
         fn message_to_inexisting_task() {
             let mut organizer = Organizer::new();
-            organizer.update(Message::List(ListMessage::AddTask));
+            organizer.update(Message::List(list_view::Message::AddTask));
 
-            organizer.update(Message::List(ListMessage::Task(
+            organizer.update(Message::List(list_view::Message::Task(
                 1,
                 task::Message::DeleteTask,
             )));
@@ -282,25 +282,25 @@ mod tests {
         fn task_message() {
             let mut organizer = Organizer::new();
 
-            organizer.update(Message::List(ListMessage::AddTask));
-            organizer.update(Message::List(ListMessage::AddTask));
-            organizer.update(Message::List(ListMessage::AddTask));
+            organizer.update(Message::List(list_view::Message::AddTask));
+            organizer.update(Message::List(list_view::Message::AddTask));
+            organizer.update(Message::List(list_view::Message::AddTask));
             assert_eq!(organizer.data.tasks.len(), 3);
 
-            organizer.update(Message::List(ListMessage::Task(
+            organizer.update(Message::List(list_view::Message::Task(
                 0,
                 task::Message::TextInput("A".to_string()),
             )));
-            organizer.update(Message::List(ListMessage::Task(
+            organizer.update(Message::List(list_view::Message::Task(
                 1,
                 task::Message::TextInput("B".to_string()),
             )));
-            organizer.update(Message::List(ListMessage::Task(
+            organizer.update(Message::List(list_view::Message::Task(
                 2,
                 task::Message::TextInput("C".to_string()),
             )));
 
-            organizer.update(Message::List(ListMessage::Task(
+            organizer.update(Message::List(list_view::Message::Task(
                 1,
                 task::Message::DeleteTask,
             )));
