@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct PeriodicTask {
     description: String,
-    initial_time: Time,
     frequency_in_hours: Option<usize>,
     initial_day: u32,
     initial_month: u32,
@@ -15,15 +14,10 @@ pub(crate) struct PeriodicTask {
 }
 
 impl PeriodicTask {
-    pub(crate) fn new(
-        description: String,
-        initial_time: Time,
-        frequency_in_hours: Option<usize>,
-    ) -> Self {
+    pub(crate) fn new(description: String, frequency_in_hours: Option<usize>) -> Self {
         let now = Time::now();
         PeriodicTask {
             description,
-            initial_time,
             frequency_in_hours,
             initial_day: now.day(),
             initial_month: now.month(),
