@@ -30,7 +30,7 @@ impl Duration {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Deserialize, Serialize, Clone)]
 pub struct TimeError {}
 
 impl Time {
