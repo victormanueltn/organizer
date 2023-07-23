@@ -1,5 +1,5 @@
 use crate::periodic_task;
-use crate::{periodic_task::PeriodicTask, periodic_task::ToIced, Organizer, Time, ViewType};
+use crate::{periodic_task::PeriodicTask, periodic_task::ToIced, Organizer, ViewType};
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -53,11 +53,10 @@ impl PeriodicTasksManagementView for Organizer {
     fn update_periodic_tasks_manager(&mut self, message: Message) {
         match message {
             Message::SelectView(value) => self.view_type = Some(value),
-            Message::Create => {
-                self.data
-                    .periodic_tasks
-                    .push(PeriodicTask::new("".to_string(), Time::now(), None))
-            }
+            Message::Create => self
+                .data
+                .periodic_tasks
+                .push(PeriodicTask::new("".to_string(), None)),
             Message::PeriodicTask(index, message) => match message {
                 periodic_task::Message::DeleteTask => _ = self.data.periodic_tasks.remove(index),
                 _ => self.data.periodic_tasks[index].update(message),
