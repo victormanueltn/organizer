@@ -56,7 +56,7 @@ impl PeriodicTasksManagementView for Organizer {
             Message::Create => self
                 .data
                 .periodic_tasks
-                .push(PeriodicTask::new("".to_string(), None)),
+                .push(PeriodicTask::new("".to_string())),
             Message::PeriodicTask(index, message) => match message {
                 periodic_task::Message::DeleteTask => _ = self.data.periodic_tasks.remove(index),
                 _ => self.data.periodic_tasks[index].update(message),

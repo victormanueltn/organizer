@@ -6,19 +6,28 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub(crate) struct PeriodicTask {
     description: String,
-    frequency_in_hours: Option<usize>,
+    frequency: Option<usize>,
+    time_period: Option<TimePeriod>,
     initial_day: u32,
     initial_month: u32,
     initial_year: u32,
     initial_date: Result<Time, TimeError>,
 }
 
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+enum TimePeriod {
+    Day,
+    Month,
+    Year,
+}
+
 impl PeriodicTask {
-    pub(crate) fn new(description: String, frequency_in_hours: Option<usize>) -> Self {
+    pub(crate) fn new(description: String) -> Self {
         let now = Time::now();
         PeriodicTask {
             description,
-            frequency_in_hours,
+            frequency: None,
+            time_period: None,
             initial_day: now.day(),
             initial_month: now.month(),
             initial_year: now.year(),
