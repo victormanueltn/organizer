@@ -1,3 +1,5 @@
+use std::string::FromUtf8Error;
+
 use crate::add_button;
 use crate::Time;
 use crate::TimeError;
@@ -48,6 +50,7 @@ pub enum Message {
     Weekly,
     Monthly,
     Yearly,
+    UpdateFrequency(String),
 }
 
 pub(crate) trait ToIced {
@@ -66,11 +69,15 @@ impl ToIced for PeriodicTask {
         );
 
         let frequency_row = {
+            let frequency = self.frequency.unwrap_or(0usize).to_string();
+            let frequency_input =
+                iced::widget::text_input("Frequency", &frequency, Message::UpdateFrequency)
+                    .padding(10);
             let daily = add_button("Daily", Message::Daily);
             let weekly = add_button("Weekly", Message::Weekly);
             let monthly = add_button("Monthly", Message::Monthly);
             let yearly = add_button("Yearly", Message::Yearly);
-            iced::widget::row!(daily, weekly, monthly, yearly)
+            iced::widget::row!(frequency_input, daily, weekly, monthly, yearly)
                 .spacing(10)
                 .padding(10)
         };
@@ -188,6 +195,17 @@ impl ToIced for PeriodicTask {
             Message::Weekly => self.time_period = Some(TimePeriod::Weekly),
             Message::Monthly => self.time_period = Some(TimePeriod::Monthly),
             Message::Yearly => self.time_period = Some(TimePeriod::Monthly),
+            Message::UpdateFrequency(frequency) => {
+                self.frequency = {
+                    if frequency.is_empty() {
+                        None
+                    } else if let Ok(frequency) = frequency.parse::<usize>() {
+                        Some(frequency)
+                    } else {
+                        None
+                    }
+                };
+            }
         };
     }
 }
