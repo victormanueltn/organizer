@@ -16,9 +16,10 @@ pub(crate) struct PeriodicTask {
 
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
 enum TimePeriod {
-    Day,
-    Month,
-    Year,
+    Daily,
+    Weekly,
+    Monthly,
+    Yearly,
 }
 
 impl PeriodicTask {
@@ -43,6 +44,10 @@ pub enum Message {
     UpdateInitialDay(String),
     UpdateInitialMonth(String),
     UpdateInitialYear(String),
+    Daily,
+    Weekly,
+    Monthly,
+    Yearly,
 }
 
 pub(crate) trait ToIced {
@@ -60,6 +65,16 @@ impl ToIced for PeriodicTask {
             Self::Message::TextInput,
         );
 
+        let frequency_row = {
+            let daily = add_button("Daily", Message::Daily);
+            let weekly = add_button("Weekly", Message::Weekly);
+            let monthly = add_button("Monthly", Message::Monthly);
+            let yearly = add_button("Yearly", Message::Yearly);
+            iced::widget::row!(daily, weekly, monthly, yearly)
+                .spacing(10)
+                .padding(10)
+        };
+
         let delete_button =
             add_button("Delete", Message::DeleteTask).style(iced::theme::Button::Destructive);
 
@@ -70,22 +85,27 @@ impl ToIced for PeriodicTask {
             .push(text_input)
             .push(delete_button);
 
-        let initial_day = self.initial_day.to_string();
-        let initial_day_input =
-            iced::widget::text_input("Initial day", &initial_day, Message::UpdateInitialDay)
-                .padding(10);
+        let initial_date_row = {
+            let initial_day = self.initial_day.to_string();
+            let initial_day_input =
+                iced::widget::text_input("Initial day", &initial_day, Message::UpdateInitialDay)
+                    .padding(10);
 
-        let initial_month = self.initial_month.to_string();
-        let initial_month_input =
-            iced::widget::text_input("Initial month", &initial_month, Message::UpdateInitialMonth)
-                .padding(10);
+            let initial_month = self.initial_month.to_string();
+            let initial_month_input = iced::widget::text_input(
+                "Initial month",
+                &initial_month,
+                Message::UpdateInitialMonth,
+            )
+            .padding(10);
 
-        let initial_year = self.initial_year.to_string();
-        let initial_year_input =
-            iced::widget::text_input("Initial year", &initial_year, Message::UpdateInitialYear)
-                .padding(10);
-        let initial_date_row =
-            iced::widget::row![initial_day_input, initial_month_input, initial_year_input];
+            let initial_year = self.initial_year.to_string();
+            let initial_year_input =
+                iced::widget::text_input("Initial year", &initial_year, Message::UpdateInitialYear)
+                    .padding(10);
+
+            iced::widget::row![initial_day_input, initial_month_input, initial_year_input]
+        };
 
         let initial_date_label =
             iced::widget::row![iced::widget::text("Initial date: Day/Month/Year")];
@@ -100,8 +120,12 @@ impl ToIced for PeriodicTask {
         );
 
         let column = {
-            let mut column =
-                iced::widget::column![initial_date_label, initial_date_row, description_row];
+            let mut column = iced::widget::column![
+                frequency_row,
+                initial_date_label,
+                initial_date_row,
+                description_row
+            ];
 
             if initial_date.is_err() {
                 column = column.push(iced::widget::row![iced::widget::text(
@@ -160,6 +184,10 @@ impl ToIced for PeriodicTask {
                     0,
                 );
             }
+            Message::Daily => self.time_period = Some(TimePeriod::Daily),
+            Message::Weekly => self.time_period = Some(TimePeriod::Weekly),
+            Message::Monthly => self.time_period = Some(TimePeriod::Monthly),
+            Message::Yearly => self.time_period = Some(TimePeriod::Monthly),
         };
     }
 }
