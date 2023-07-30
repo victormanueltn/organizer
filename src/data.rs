@@ -102,6 +102,7 @@ mod tests {
     fn save_and_load_returns_same_data() {
         let data = Data {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
+            periodic_tasks: vec![],
             filters: Filters {
                 todo: true,
                 complete: true,
@@ -140,6 +141,7 @@ mod tests {
     fn save_to_inexistent_folder() {
         let data = Data {
             tasks: vec![Task::new(0_usize), Task::new(1_usize)],
+            periodic_tasks: vec![],
             filters: Filters {
                 todo: true,
                 complete: true,

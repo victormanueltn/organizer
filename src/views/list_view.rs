@@ -71,6 +71,19 @@ impl ListView for Organizer {
     }
 
     fn update_list_view(&mut self, message: Message) {
+        self.data
+            .periodic_tasks
+            .iter_mut()
+            .map(|periodic_task| periodic_task.create_tasks())
+            .enumerate()
+            .for_each(|(index, tasks)| {
+                let size = self.data.tasks.len();
+                tasks.into_iter().for_each(|mut task| {
+                    task.id = size + index + 1usize;
+                    self.data.tasks.push(task);
+                })
+            });
+
         match message {
             Message::AddTask => self.add_task(),
             Message::Task(task_id, task_message) => {

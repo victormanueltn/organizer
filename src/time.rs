@@ -1,3 +1,5 @@
+use core::fmt;
+
 use chrono::{DateTime, Datelike, FixedOffset, Timelike};
 use chrono::{LocalResult, TimeZone};
 use serde::{Deserialize, Serialize};
@@ -27,6 +29,27 @@ impl Duration {
         Self {
             duration: chrono::Duration::hours(hours),
         }
+    }
+}
+
+impl fmt::Display for Time {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}-{}-{}: {}:{}:{}",
+            self.day(),
+            self.month(),
+            self.year(),
+            self.hour(),
+            self.minute(),
+            self.second()
+        )
+    }
+}
+
+impl fmt::Display for Duration {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.duration.num_hours())
     }
 }
 
@@ -71,6 +94,18 @@ impl Time {
     pub(crate) fn year(&self) -> u32 {
         self.time.year().try_into().unwrap()
     }
+
+    pub(crate) fn hour(&self) -> u32 {
+        self.time.hour().try_into().unwrap()
+    }
+
+    pub(crate) fn minute(&self) -> u32 {
+        self.time.minute().try_into().unwrap()
+    }
+
+    pub(crate) fn second(&self) -> u32 {
+        self.time.second().try_into().unwrap()
+    }
 }
 
 impl From<&str> for Time {
@@ -114,6 +149,22 @@ impl std::ops::Div<Self> for Duration {
             0 => panic!(),
             _ => self.duration.num_seconds() as f32 / rhs.duration.num_seconds() as f32,
         }
+    }
+}
+
+impl<'a, 'b> std::ops::Add<&'b Duration> for &'a Time {
+    type Output = Time;
+    fn add(self, rhs: &Duration) -> Self::Output {
+        let new_time = self.time + rhs.duration;
+        Time::new(
+            new_time.day(),
+            new_time.month(),
+            new_time.year() as u32,
+            new_time.hour(),
+            new_time.hour(),
+            new_time.second(),
+        )
+        .unwrap()
     }
 }
 

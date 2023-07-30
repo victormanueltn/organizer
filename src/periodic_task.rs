@@ -1,4 +1,6 @@
 use crate::add_button;
+use crate::task::Task;
+use crate::Duration;
 use crate::Time;
 use crate::TimeError;
 use serde::{Deserialize, Serialize};
@@ -12,6 +14,7 @@ pub(crate) struct PeriodicTask {
     initial_month: u32,
     initial_year: u32,
     initial_date: Result<Time, TimeError>,
+    last_created: Time,
 }
 
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
@@ -33,6 +36,46 @@ impl PeriodicTask {
             initial_month: now.month(),
             initial_year: now.year(),
             initial_date: Time::new(now.day(), now.month(), now.year(), 0, 0, 0),
+            last_created: now,
+        }
+    }
+
+    pub(crate) fn create_tasks(&mut self) -> Vec<Task> {
+        if self.description.is_empty() {
+            return vec![];
+        }
+        let required = (&self.frequency, &self.time_period);
+        if let (Some(ref _frequency), Some(ref _time_period)) = required {
+            let now = Time::now();
+            let period = Duration::from_hours(i64::try_from(self.period_in_hours()).unwrap());
+            let mut tasks = vec![];
+            while &self.last_created + &period < now {
+                let previous = self.last_created.clone();
+                self.last_created = &previous + &period;
+                let description = self.description.clone() + " - "+ &self.last_created.to_string();
+                let mut task = Task::new(0);
+                task.edit(&description);
+                tasks.push(task);
+            }
+            tasks
+        } else {
+            vec![]
+        }
+    }
+
+    fn period_in_hours(&self) -> usize {
+        const HOURS_PER_DAY: usize = 24;
+        const DAYS_PER_WEEK: usize = 7;
+        const WEEKS_PER_MONTH: usize = 4;
+        const MONTHS_PER_YEAR: usize = 12;
+        let frequency = self.frequency.unwrap();
+        match self.time_period.as_ref().unwrap() {
+            TimePeriod::Daily => HOURS_PER_DAY / frequency,
+            TimePeriod::Weekly => DAYS_PER_WEEK * HOURS_PER_DAY / frequency,
+            TimePeriod::Monthly => WEEKS_PER_MONTH * DAYS_PER_WEEK * HOURS_PER_DAY / frequency,
+            TimePeriod::Yearly => {
+                MONTHS_PER_YEAR * WEEKS_PER_MONTH * DAYS_PER_WEEK * HOURS_PER_DAY / frequency
+            }
         }
     }
 }
@@ -205,5 +248,47 @@ impl ToIced for PeriodicTask {
                 };
             }
         };
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn period_in_hours() {
+        let mut periodic_task = PeriodicTask::new("test".to_string());
+
+        periodic_task.frequency = Some(1);
+        periodic_task.time_period = Some(TimePeriod::Daily);
+        assert_eq!(periodic_task.period_in_hours(), 24);
+
+        periodic_task.frequency = Some(1);
+        periodic_task.time_period = Some(TimePeriod::Weekly);
+        assert_eq!(periodic_task.period_in_hours(), 24 * 7);
+
+        periodic_task.frequency = Some(1);
+        periodic_task.time_period = Some(TimePeriod::Monthly);
+        assert_eq!(periodic_task.period_in_hours(), 24 * 7 * 4);
+
+        periodic_task.frequency = Some(1);
+        periodic_task.time_period = Some(TimePeriod::Yearly);
+        assert_eq!(periodic_task.period_in_hours(), 24 * 7 * 4 * 12);
+
+        periodic_task.frequency = Some(2);
+        periodic_task.time_period = Some(TimePeriod::Daily);
+        assert_eq!(periodic_task.period_in_hours(), 24 / 2);
+
+        periodic_task.frequency = Some(2);
+        periodic_task.time_period = Some(TimePeriod::Weekly);
+        assert_eq!(periodic_task.period_in_hours(), 24 / 2 * 7);
+
+        periodic_task.frequency = Some(2);
+        periodic_task.time_period = Some(TimePeriod::Monthly);
+        assert_eq!(periodic_task.period_in_hours(), 24 / 2 * 7 * 4);
+
+        periodic_task.frequency = Some(2);
+        periodic_task.time_period = Some(TimePeriod::Yearly);
+        assert_eq!(periodic_task.period_in_hours(), 24 / 2 * 7 * 4 * 12);
     }
 }
