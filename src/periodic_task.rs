@@ -119,13 +119,17 @@ impl ToIced for PeriodicTask {
             let frequency_input =
                 iced::widget::text_input("Frequency", &frequency, Message::UpdateFrequency)
                     .padding(10);
-            let mut daily = add_button("Daily", Message::Daily);
-            let mut weekly = add_button("Weekly", Message::Weekly);
-            let mut monthly = add_button("Monthly", Message::Monthly);
-            let mut yearly = add_button("Yearly", Message::Yearly);
+
+            let mut daily =
+                add_button("Daily", Message::Daily).style(iced::theme::Button::Secondary);
+            let mut weekly =
+                add_button("Weekly", Message::Weekly).style(iced::theme::Button::Secondary);
+            let mut monthly =
+                add_button("Monthly", Message::Monthly).style(iced::theme::Button::Secondary);
+            let mut yearly =
+                add_button("Yearly", Message::Yearly).style(iced::theme::Button::Secondary);
 
             let active_style = iced::theme::Button::Positive;
-
             if self.time_period.is_some() {
                 match self.time_period.as_ref().unwrap() {
                     TimePeriod::Daily => daily = daily.style(active_style),
