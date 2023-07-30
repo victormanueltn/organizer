@@ -64,13 +64,8 @@ impl PeriodicTask {
     }
 
     fn period_in_seconds(&self) -> Option<usize> {
-        if self.frequency.is_none() {
-            return None;
-        };
-
-        if self.time_period.is_none() {
-            return None;
-        };
+        self.frequency?;
+        self.time_period.as_ref()?;
 
         const SECONDS_PER_DAY: usize = 3600 * 24;
         const DAYS_PER_WEEK: usize = 7;
