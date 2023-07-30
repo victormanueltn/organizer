@@ -96,15 +96,15 @@ impl Time {
     }
 
     pub(crate) fn hour(&self) -> u32 {
-        self.time.hour().try_into().unwrap()
+        self.time.hour()
     }
 
     pub(crate) fn minute(&self) -> u32 {
-        self.time.minute().try_into().unwrap()
+        self.time.minute()
     }
 
     pub(crate) fn second(&self) -> u32 {
-        self.time.second().try_into().unwrap()
+        self.time.second()
     }
 }
 
