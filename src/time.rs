@@ -30,6 +30,12 @@ impl Duration {
             duration: chrono::Duration::hours(hours),
         }
     }
+
+    pub(crate) fn from_seconds(seconds: i64) -> Self {
+        Self {
+            duration: chrono::Duration::seconds(seconds),
+        }
+    }
 }
 
 impl fmt::Display for Time {
@@ -161,7 +167,7 @@ impl<'a, 'b> std::ops::Add<&'b Duration> for &'a Time {
             new_time.month(),
             new_time.year() as u32,
             new_time.hour(),
-            new_time.hour(),
+            new_time.minute(),
             new_time.second(),
         )
         .unwrap()
