@@ -119,10 +119,22 @@ impl ToIced for PeriodicTask {
             let frequency_input =
                 iced::widget::text_input("Frequency", &frequency, Message::UpdateFrequency)
                     .padding(10);
-            let daily = add_button("Daily", Message::Daily);
-            let weekly = add_button("Weekly", Message::Weekly);
-            let monthly = add_button("Monthly", Message::Monthly);
-            let yearly = add_button("Yearly", Message::Yearly);
+            let mut daily = add_button("Daily", Message::Daily);
+            let mut weekly = add_button("Weekly", Message::Weekly);
+            let mut monthly = add_button("Monthly", Message::Monthly);
+            let mut yearly = add_button("Yearly", Message::Yearly);
+
+            let active_style = iced::theme::Button::Positive;
+
+            if self.time_period.is_some() {
+                match self.time_period.as_ref().unwrap() {
+                    TimePeriod::Daily => daily = daily.style(active_style),
+                    TimePeriod::Weekly => weekly = weekly.style(active_style),
+                    TimePeriod::Monthly => monthly = monthly.style(active_style),
+                    TimePeriod::Yearly => yearly = yearly.style(active_style),
+                };
+            };
+
             iced::widget::row!(frequency_input, daily, weekly, monthly, yearly)
                 .spacing(10)
                 .padding(10)
@@ -188,7 +200,7 @@ impl ToIced for PeriodicTask {
             column
         };
 
-        column.padding(30).into()
+        column.padding(40).into()
     }
 
     fn update(&mut self, message: Self::Message) {
@@ -240,7 +252,7 @@ impl ToIced for PeriodicTask {
             Message::Daily => self.time_period = Some(TimePeriod::Daily),
             Message::Weekly => self.time_period = Some(TimePeriod::Weekly),
             Message::Monthly => self.time_period = Some(TimePeriod::Monthly),
-            Message::Yearly => self.time_period = Some(TimePeriod::Monthly),
+            Message::Yearly => self.time_period = Some(TimePeriod::Yearly),
             Message::UpdateFrequency(frequency) => {
                 self.frequency = {
                     if frequency.is_empty() {
