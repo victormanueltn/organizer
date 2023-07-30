@@ -193,7 +193,7 @@ impl ToIced for PeriodicTask {
             column
         };
 
-        column.into()
+        column.padding(30).into()
     }
 
     fn update(&mut self, message: Self::Message) {
