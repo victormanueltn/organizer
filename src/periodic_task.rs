@@ -10,6 +10,8 @@ pub(crate) struct PeriodicTask {
     description: String,
     frequency: Option<usize>,
     time_period: Option<TimePeriod>,
+    initial_hour: u32,
+    initial_minute: u32,
     initial_day: u32,
     initial_month: u32,
     initial_year: u32,
@@ -32,6 +34,8 @@ impl PeriodicTask {
             description,
             frequency: None,
             time_period: None,
+            initial_hour: now.hour(),
+            initial_minute: now.minute(),
             initial_day: now.day(),
             initial_month: now.month(),
             initial_year: now.year(),
@@ -89,6 +93,8 @@ impl PeriodicTask {
 pub enum Message {
     TextInput(String),
     DeleteTask,
+    UpdateInitialHour(String),
+    UpdateInitialMinute(String),
     UpdateInitialDay(String),
     UpdateInitialMonth(String),
     UpdateInitialYear(String),
@@ -179,12 +185,32 @@ impl ToIced for PeriodicTask {
         let initial_date_label =
             iced::widget::row![iced::widget::text("Initial date: Day/Month/Year")];
 
+        let initial_time_row = {
+            let initial_hour = self.initial_hour.to_string();
+            let initial_hour_input =
+                iced::widget::text_input("Initial hour", &initial_hour, Message::UpdateInitialHour)
+                    .padding(10);
+
+            let initial_minute = self.initial_minute.to_string();
+            let initial_minute_input = iced::widget::text_input(
+                "Initial minute",
+                &initial_minute,
+                Message::UpdateInitialMinute,
+            )
+            .padding(10);
+
+            iced::widget::row![initial_hour_input, initial_minute_input]
+        };
+
+        let initial_time_label =
+            iced::widget::row![iced::widget::text("Initial time: Hour - Minute")];
+
         let initial_date = Time::new(
             self.initial_day,
             self.initial_month,
             self.initial_year,
-            0,
-            0,
+            self.initial_hour,
+            self.initial_minute,
             0,
         );
 
@@ -193,6 +219,8 @@ impl ToIced for PeriodicTask {
                 frequency_row,
                 initial_date_label,
                 initial_date_row,
+                initial_time_label,
+                initial_time_row,
                 description_row
             ];
 
@@ -226,8 +254,8 @@ impl ToIced for PeriodicTask {
                     self.initial_day,
                     self.initial_month,
                     self.initial_year,
-                    0,
-                    0,
+                    self.initial_hour,
+                    self.initial_minute,
                     0,
                 );
             }
@@ -237,8 +265,8 @@ impl ToIced for PeriodicTask {
                     self.initial_day,
                     self.initial_month,
                     self.initial_year,
-                    0,
-                    0,
+                    self.initial_hour,
+                    self.initial_minute,
                     0,
                 );
             }
@@ -248,11 +276,36 @@ impl ToIced for PeriodicTask {
                     self.initial_day,
                     self.initial_month,
                     self.initial_year,
-                    0,
-                    0,
+                    self.initial_hour,
+                    self.initial_minute,
                     0,
                 );
             }
+
+            Message::UpdateInitialHour(value) => {
+                handle_update(&value, 60, &mut self.initial_hour);
+                self.initial_date = Time::new(
+                    self.initial_day,
+                    self.initial_month,
+                    self.initial_year,
+                    self.initial_hour,
+                    self.initial_minute,
+                    0,
+                );
+            }
+
+            Message::UpdateInitialMinute(value) => {
+                handle_update(&value, 60, &mut self.initial_minute);
+                self.initial_date = Time::new(
+                    self.initial_day,
+                    self.initial_month,
+                    self.initial_year,
+                    self.initial_hour,
+                    self.initial_minute,
+                    0,
+                );
+            }
+
             Message::Daily => self.time_period = Some(TimePeriod::Daily),
             Message::Weekly => self.time_period = Some(TimePeriod::Weekly),
             Message::Monthly => self.time_period = Some(TimePeriod::Monthly),
