@@ -16,7 +16,7 @@ pub(crate) struct PeriodicTask {
     initial_month: u32,
     initial_year: u32,
     initial_date: Result<Time, TimeError>,
-    last_created: Time,
+    last_created: Option<Time>,
 }
 
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
@@ -40,7 +40,7 @@ impl PeriodicTask {
             initial_month: now.month(),
             initial_year: now.year(),
             initial_date: Time::new(now.day(), now.month(), now.year(), 0, 0, 0),
-            last_created: now,
+            last_created: None,
         }
     }
 
@@ -53,10 +53,15 @@ impl PeriodicTask {
             let now = Time::now();
             let period = Duration::from_seconds(period as i64);
             let mut tasks = vec![];
-            while &self.last_created + &period < now {
-                let previous = self.last_created.clone();
-                self.last_created = &previous + &period;
-                let description = self.description.clone() + " - " + &self.last_created.to_string();
+            while self.last_created.is_none() || self.last_created.as_ref().unwrap() + &period < now
+            {
+                let previous = if self.last_created.is_none() {
+                    self.initial_date.clone().unwrap()
+                } else {
+                    self.last_created.clone().unwrap()
+                };
+                self.last_created = Some(&previous + &period);
+                let description = self.description.clone() + " - " + &self.last_created.as_ref().unwrap().to_string();
                 let mut task = Task::new(0);
                 task.edit(&description);
                 tasks.push(task);
