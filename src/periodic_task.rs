@@ -39,7 +39,14 @@ impl PeriodicTask {
             initial_day: now.day(),
             initial_month: now.month(),
             initial_year: now.year(),
-            initial_date: Time::new(now.day(), now.month(), now.year(), 0, 0, 0),
+            initial_date: Time::new(
+                now.day(),
+                now.month(),
+                now.year(),
+                now.hour(),
+                now.minute(),
+                now.second(),
+            ),
             last_created: None,
         }
     }
@@ -48,20 +55,45 @@ impl PeriodicTask {
         if self.description.is_empty() {
             return vec![];
         }
+
+        println!("Create tasks {}", &self.description);
+
         let period = self.period_in_seconds();
         if let Some(period) = period {
             let now = Time::now();
             let period = Duration::from_seconds(period as i64);
             let mut tasks = vec![];
-            while self.last_created.is_none() || self.last_created.as_ref().unwrap() + &period < now
-            {
-                let previous = if self.last_created.is_none() {
-                    self.initial_date.clone().unwrap()
+
+            if self.last_created.is_none() {
+                println!("Last created is none");
+                println!("initial_date {}", self.initial_date.clone().unwrap());
+                println!("now {now}");
+                println!(
+                    "initial_date < now {}",
+                    self.initial_date.clone().unwrap() < now
+                );
+                let initial_date = self.initial_date.clone().unwrap();
+                if initial_date < now {
+                    let description = self.description.clone() + " - " + &initial_date.to_string();
+                    let mut task = Task::new(0);
+                    task.edit(&description);
+                    tasks.push(task);
+                    self.last_created = Some(initial_date);
                 } else {
-                    self.last_created.clone().unwrap()
+                    return vec![];
+                }
+            }
+
+            //println!("last_created {}", self.last_created.as_ref().unwrap());
+            while self.last_created.as_ref().unwrap() + &period < now {
+                let (previous, creation_time) = {
+                    (
+                        self.last_created.clone().unwrap(),
+                        self.last_created.as_ref().unwrap().to_string(),
+                    )
                 };
                 self.last_created = Some(&previous + &period);
-                let description = self.description.clone() + " - " + &self.last_created.as_ref().unwrap().to_string();
+                let description = self.description.clone() + " - " + &creation_time;
                 let mut task = Task::new(0);
                 task.edit(&description);
                 tasks.push(task);
@@ -288,7 +320,7 @@ impl ToIced for PeriodicTask {
             }
 
             Message::UpdateInitialHour(value) => {
-                handle_update(&value, 60, &mut self.initial_hour);
+                handle_update(&value, 24, &mut self.initial_hour);
                 self.initial_date = Time::new(
                     self.initial_day,
                     self.initial_month,

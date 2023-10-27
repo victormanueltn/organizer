@@ -1,12 +1,12 @@
 use core::fmt;
 
-use chrono::{DateTime, Datelike, FixedOffset, Timelike};
+use chrono::{DateTime, Datelike, FixedOffset, Local, Timelike};
 use chrono::{LocalResult, TimeZone};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub(crate) struct Time {
-    time: DateTime<FixedOffset>,
+    pub time: DateTime<Local>,
 }
 
 #[derive(Debug, PartialEq, PartialOrd)]
@@ -72,7 +72,7 @@ impl Time {
         second: u32,
     ) -> Result<Time, TimeError> {
         let year: i32 = year.try_into().unwrap();
-        let time = chrono::Utc.with_ymd_and_hms(year, month, day, hour, minute, second);
+        let time = chrono::Local.with_ymd_and_hms(year, month, day, hour, minute, second);
         if let LocalResult::Single(time) = time {
             Ok(Time { time: time.into() })
         } else {
@@ -84,7 +84,7 @@ impl Time {
         Time {
             time: {
                 let now = chrono::Local::now();
-                DateTime::parse_from_rfc2822(&now.to_rfc2822()).unwrap()
+                now
             },
         }
     }
@@ -117,7 +117,10 @@ impl Time {
 impl From<&str> for Time {
     fn from(time: &str) -> Time {
         Time {
-            time: DateTime::parse_from_rfc2822(time).unwrap(),
+            //time: DateTime::parse_from_rfc2822(time).unwrap(),
+            time: DateTime::parse_from_rfc2822(time)
+                .unwrap()
+                .with_timezone(&Local),
         }
     }
 }
@@ -201,11 +204,11 @@ mod tests {
 
     use super::*;
     use std::fmt;
-    impl fmt::Display for Time {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.time.to_rfc2822())
-        }
-    }
+    //impl fmt::Display for Time {
+    //    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    //        write!(f, "{}", self.time.to_rfc2822())
+    //    }
+    //}
 
     #[test]
     fn new_from_string() {
@@ -278,5 +281,25 @@ mod tests {
 
         let time_2 = Time::new(29, 4, 2023, 14, 08, 59);
         assert!(time_1 > time_2.unwrap());
+    }
+
+    #[test]
+    fn reference_comparison() {
+        let year = 2023;
+        let month = 4;
+        let day = 29;
+        let date = chrono::Utc
+            .with_ymd_and_hms(year, month, day, 14, 09, 0)
+            .unwrap();
+        let time_1 = Time::from(date.to_rfc2822().as_str());
+
+        let time_2 = Time::new(29, 4, 2023, 14, 09, 0);
+        assert!(&time_1 == time_2.as_ref().unwrap());
+
+        let time_2 = Time::new(29, 4, 2023, 14, 09, 1);
+        assert!(&time_1 < time_2.as_ref().unwrap());
+
+        let time_2 = Time::new(29, 4, 2023, 14, 08, 59);
+        assert!(&time_1 > time_2.as_ref().unwrap());
     }
 }
