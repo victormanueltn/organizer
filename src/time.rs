@@ -74,7 +74,7 @@ impl Time {
         let year: i32 = year.try_into().unwrap();
         let time = chrono::Local.with_ymd_and_hms(year, month, day, hour, minute, second);
         if let LocalResult::Single(time) = time {
-            Ok(Time { time: time.into() })
+            Ok(Time { time })
         } else {
             Err(TimeError {})
         }
@@ -82,10 +82,7 @@ impl Time {
 
     pub(crate) fn now() -> Time {
         Time {
-            time: {
-                let now = chrono::Local::now();
-                now
-            },
+            time: { chrono::Local::now() },
         }
     }
 
