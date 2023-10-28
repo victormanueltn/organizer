@@ -31,7 +31,7 @@ impl SummaryView for Organizer {
 
         let last_day_button = add_button("Last day", Message::LastDay);
         let last_week_button = add_button("Last week", Message::LastWeek);
-        let last_two_weeks_button = add_button("Last two week", Message::LastTwoWeeks);
+        let last_two_weeks_button = add_button("Last two weeks", Message::LastTwoWeeks);
         let periods_row =
             iced::widget::row!(last_day_button, last_week_button, last_two_weeks_button)
                 .spacing(10)
