@@ -1,6 +1,6 @@
 use core::fmt;
 
-use chrono::{DateTime, Datelike, FixedOffset, Local, Timelike};
+use chrono::{DateTime, Datelike, Local, Timelike};
 use chrono::{LocalResult, TimeZone};
 use serde::{Deserialize, Serialize};
 
