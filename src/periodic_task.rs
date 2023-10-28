@@ -56,8 +56,6 @@ impl PeriodicTask {
             return vec![];
         }
 
-        println!("Create tasks {}", &self.description);
-
         let period = self.period_in_seconds();
         if let Some(period) = period {
             let now = Time::now();
@@ -65,13 +63,6 @@ impl PeriodicTask {
             let mut tasks = vec![];
 
             if self.last_created.is_none() {
-                println!("Last created is none");
-                println!("initial_date {}", self.initial_date.clone().unwrap());
-                println!("now {now}");
-                println!(
-                    "initial_date < now {}",
-                    self.initial_date.clone().unwrap() < now
-                );
                 let initial_date = self.initial_date.clone().unwrap();
                 if initial_date < now {
                     let description = self.description.clone() + " - " + &initial_date.to_string();
@@ -84,7 +75,6 @@ impl PeriodicTask {
                 }
             }
 
-            //println!("last_created {}", self.last_created.as_ref().unwrap());
             while self.last_created.as_ref().unwrap() + &period < now {
                 let (previous, creation_time) = {
                     (
