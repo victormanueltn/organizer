@@ -6,6 +6,7 @@ use iced::{
 pub(crate) trait ToIced {
     type Message;
     fn view(&self) -> Element<Self::Message>;
+    fn update(&mut self, message: Self::Message);
 }
 
 pub(crate) fn add_button<Message>(text: &str, message: Message) -> Button<Message> {

@@ -1,5 +1,6 @@
+use crate::toiced::ToIced;
 use crate::periodic_task;
-use crate::{periodic_task::PeriodicTask, periodic_task::ToIced, Organizer, ViewType};
+use crate::{periodic_task::PeriodicTask, Organizer, ViewType};
 
 #[derive(Debug, Clone)]
 pub enum Message {

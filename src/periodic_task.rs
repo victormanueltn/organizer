@@ -1,5 +1,6 @@
 use crate::add_button;
 use crate::task::Task;
+use crate::toiced::ToIced;
 use crate::Duration;
 use crate::Time;
 use crate::TimeError;
@@ -130,12 +131,6 @@ pub enum Message {
     Monthly,
     Yearly,
     UpdateFrequency(String),
-}
-
-pub(crate) trait ToIced {
-    type Message;
-    fn view(&self) -> iced::Element<Self::Message>;
-    fn update(&mut self, message: Self::Message);
 }
 
 impl ToIced for PeriodicTask {
