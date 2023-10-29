@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 
 use crate::data::Data;
-use crate::tasktoiced::TaskToIced;
 use crate::fonts::icons::{downwards_arrow, upwards_arrow};
+use crate::toiced::ToIced;
 use crate::views::list_view::Message;
 use iced::{
     alignment,

@@ -1,5 +1,5 @@
-use crate::toiced::ToIced;
 use crate::periodic_task;
+use crate::toiced::ToIced;
 use crate::{periodic_task::PeriodicTask, Organizer, ViewType};
 
 #[derive(Debug, Clone)]

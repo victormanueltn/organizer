@@ -1,3 +1,4 @@
+use crate::toiced::ToIced;
 use crate::task::{self, Task};
 use crate::time::Duration;
 use crate::time::Time;
@@ -9,12 +10,6 @@ use iced::Element;
 struct TextInputStyle {
     theme: iced::theme::Theme,
     text_transparency: f32,
-}
-
-pub(crate) trait TaskToIced {
-    type Message;
-    fn view(&self) -> iced::Element<Self::Message>;
-    fn update(&mut self, message: Self::Message);
 }
 
 pub(crate) const FADE_OUT_TIME: i64 = 60 * 24;
@@ -77,7 +72,7 @@ impl StyleSheet for TextInputStyle {
     }
 }
 
-impl TaskToIced for Task {
+impl ToIced for Task {
     type Message = task::Message;
     fn view(&self) -> Element<task::Message> {
         let a_checkbox = checkbox(
