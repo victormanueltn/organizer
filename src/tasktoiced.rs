@@ -1,7 +1,7 @@
 use crate::task::{self, Task};
 use crate::time::Duration;
 use crate::time::Time;
-use crate::toiced::{add_button, ToIced};
+use crate::toiced::add_button;
 use iced::widget::text_input::StyleSheet;
 use iced::widget::{checkbox, row, text_input};
 use iced::Element;
@@ -9,6 +9,12 @@ use iced::Element;
 struct TextInputStyle {
     theme: iced::theme::Theme,
     text_transparency: f32,
+}
+
+pub(crate) trait TaskToIced {
+    type Message;
+    fn view(&self) -> iced::Element<Self::Message>;
+    fn update(&mut self, message: Self::Message);
 }
 
 pub(crate) const FADE_OUT_TIME: i64 = 60 * 24;
@@ -71,7 +77,7 @@ impl StyleSheet for TextInputStyle {
     }
 }
 
-impl ToIced for Task {
+impl TaskToIced for Task {
     type Message = task::Message;
     fn view(&self) -> Element<task::Message> {
         let a_checkbox = checkbox(
@@ -123,5 +129,21 @@ impl ToIced for Task {
             .push(delete_button);
 
         a_row.into()
+    }
+
+    fn update(&mut self, message: Self::Message) {
+        match message {
+            task::Message::ToggleTaskCompletion(completed) => {
+                self.set_completed(completed);
+                if !completed {
+                    self.completion_time = None
+                }
+            }
+            task::Message::TextInput(description) => self.edit(&description),
+            task::Message::DeleteTask => {
+                //self.data.tasks.remove(task_id);
+                unreachable!();
+            }
+        }
     }
 }

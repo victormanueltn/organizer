@@ -1,15 +1,22 @@
 use std::collections::VecDeque;
 
+use crate::data::Data;
+use crate::tasktoiced::TaskToIced;
 use crate::fonts::icons::{downwards_arrow, upwards_arrow};
 use crate::views::list_view::Message;
-use crate::{data::Data, toiced::ToIced};
 use iced::{
     alignment,
     widget::{button, column, container, Column, Text},
     Element, Length,
 };
 
-impl ToIced for Data {
+pub(crate) trait DataToIced {
+    type Message;
+    fn view(&self) -> iced::Element<Self::Message>;
+    //fn update(&mut self, message: Self::Message);
+}
+
+impl DataToIced for Data {
     type Message = Message;
     fn view(&self) -> Element<Self::Message> {
         let create_swap_buttons = |index| {
@@ -68,6 +75,16 @@ impl ToIced for Data {
 
         container(a_column).width(Length::Fill).center_x().into()
     }
+
+    //fn update(&mut self, message: Message) {
+    //    match message {
+    //        Message::List(message) => self.update_list_view(message),
+    //        Message::Summary(message) => self.update_summary_view(message),
+    //        Message::PeriodicTasksManagement(message) => {
+    //            self.update_periodic_tasks_manager(message)
+    //        }
+    //    }
+    //}
 }
 
 fn add_task_button(a_column: Column<Message>) -> Column<Message> {

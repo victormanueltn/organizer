@@ -131,23 +131,6 @@ impl Organizer {
         self.data.tasks.push(Task::new(self.data.tasks.len()))
     }
 
-    pub fn process_task_message(&mut self, task_id: usize, task_message: task::Message) {
-        if let Some(a_task) = self.data.tasks.get_mut(task_id) {
-            match task_message {
-                task::Message::ToggleTaskCompletion(completed) => {
-                    a_task.set_completed(completed);
-                    if !completed {
-                        a_task.completion_time = None
-                    }
-                }
-                task::Message::TextInput(description) => a_task.edit(&description),
-                task::Message::DeleteTask => {
-                    self.data.tasks.remove(task_id);
-                }
-            }
-        }
-    }
-
     pub(crate) fn search_for_file_in_working_directory() -> Option<String> {
         let current_directory = std::env::current_dir().unwrap();
 
@@ -186,74 +169,6 @@ mod tests {
         organizer.add_task();
         organizer.add_task();
         assert_eq!(organizer.data.tasks.len(), 4);
-    }
-
-    mod process_task_message {
-        use super::*;
-
-        #[test]
-        fn toggle_task_completion() {
-            let mut organizer = Organizer::new();
-            organizer.add_task();
-
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
-                assert!(!task.completed());
-            }
-
-            organizer.process_task_message(0, task::Message::ToggleTaskCompletion(false));
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
-                assert!(!task.completed());
-            }
-
-            organizer.process_task_message(0, task::Message::ToggleTaskCompletion(true));
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
-                assert!(task.completed());
-            }
-
-            organizer.process_task_message(0, task::Message::ToggleTaskCompletion(false));
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
-                assert!(!task.completed());
-            }
-        }
-
-        #[test]
-        fn text_input() {
-            let mut organizer = Organizer::new();
-            organizer.add_task();
-
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
-                assert_eq!(task.description(), "");
-            }
-
-            organizer
-                .process_task_message(0, task::Message::TextInput("A description".to_string()));
-            {
-                let task = organizer.data.tasks.get(0).unwrap();
-                assert_eq!(task.description(), "A description");
-            }
-        }
-
-        #[test]
-        fn delete_task() {
-            let mut organizer = Organizer::new();
-            organizer.add_task();
-            organizer.add_task();
-            assert_eq!(organizer.data.tasks.len(), 2);
-
-            organizer.process_task_message(0, task::Message::DeleteTask);
-            assert_eq!(organizer.data.tasks.len(), 1);
-
-            organizer.process_task_message(0, task::Message::DeleteTask);
-            assert_eq!(organizer.data.tasks.len(), 0);
-
-            organizer.process_task_message(1, task::Message::DeleteTask);
-            assert_eq!(organizer.data.tasks.len(), 0);
-        }
     }
 
     mod update {

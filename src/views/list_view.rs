@@ -1,4 +1,5 @@
-use crate::toiced::ToIced;
+use crate::datatoiced::DataToIced;
+use crate::tasktoiced::TaskToIced;
 use crate::ViewType;
 use crate::{add_button, task, Organizer};
 use crate::{Data, Text};
@@ -90,7 +91,10 @@ impl ListView for Organizer {
                 if task_id > self.data.tasks.len() {
                     panic!("Tried to update inexisting task.")
                 };
-                self.process_task_message(task_id, task_message)
+                if let task::Message::DeleteTask = task_message {
+                    self.data.tasks.remove(task_id);
+                }
+                self.data.tasks[task_id].update(task_message);
             }
             Message::UpdateSaveFileName(file_name) => {
                 self.file_name = Some(file_name);
