@@ -93,8 +93,9 @@ impl ListView for Organizer {
                 };
                 if let task::Message::DeleteTask = task_message {
                     self.data.tasks.remove(task_id);
-                }
+                } else {
                 self.data.tasks[task_id].update(task_message);
+                }
             }
             Message::UpdateSaveFileName(file_name) => {
                 self.file_name = Some(file_name);
