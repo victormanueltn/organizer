@@ -1,10 +1,10 @@
-use crate::toiced::ToIced;
 use crate::task::{self, Task};
 use crate::time::Duration;
 use crate::time::Time;
 use crate::toiced::add_button;
+use crate::toiced::ToIced;
 use iced::widget::text_input::StyleSheet;
-use iced::widget::{checkbox, row, text_input};
+use iced::widget::{checkbox, column, row, text_input};
 use iced::Element;
 
 struct TextInputStyle {
@@ -115,15 +115,52 @@ impl ToIced for Task {
         let delete_button =
             add_button("Delete", task::Message::DeleteTask).style(iced::theme::Button::Destructive);
 
+        let snooze_button = add_button("Snooze", task::Message::AddSnoozeTime)
+            .style(iced::theme::Button::Secondary);
+
         let a_row = row(vec![])
             .spacing(10)
             .padding(10)
             .align_items(iced::Alignment::Center)
             .push(a_checkbox)
             .push(a_text_input)
-            .push(delete_button);
+            .push(delete_button)
+            .push(snooze_button);
 
-        a_row.into()
+        let mut a_column = column(vec![]).push(a_row);
+
+        let snooze_duration_row = if self.snooze_information.visible {
+            let hour = add_button(
+                "Hour",
+                task::Message::SetSnoozeDuration(task::SnoozeDuration::Hour),
+            )
+            .style(iced::theme::Button::Secondary);
+            let day = add_button(
+                "Day",
+                task::Message::SetSnoozeDuration(task::SnoozeDuration::Day),
+            )
+            .style(iced::theme::Button::Secondary);
+            let week = add_button(
+                "Week",
+                task::Message::SetSnoozeDuration(task::SnoozeDuration::Week),
+            )
+            .style(iced::theme::Button::Secondary);
+            let month = add_button(
+                "Month",
+                task::Message::SetSnoozeDuration(task::SnoozeDuration::Month),
+            )
+            .style(iced::theme::Button::Secondary);
+
+            Some(row(vec![]).push(hour).push(day).push(week).push(month))
+        } else {
+            None
+        };
+
+        if let Some(snooze_duration_row) = snooze_duration_row {
+            a_column = a_column.push(snooze_duration_row);
+        }
+
+        a_column.into()
     }
 
     fn update(&mut self, message: Self::Message) {
@@ -136,8 +173,22 @@ impl ToIced for Task {
             }
             task::Message::TextInput(description) => self.edit(&description),
             task::Message::DeleteTask => {
-                //self.data.tasks.remove(task_id);
                 unreachable!();
+            }
+            task::Message::AddSnoozeTime => {
+                self.snooze_information.visible = true;
+                self.snooze_information.snooze_until = Some(Time::now());
+            }
+            task::Message::SetSnoozeDuration(duration) => {
+                self.snooze_information.visible = false;
+                let duration: Duration = match duration {
+                    task::SnoozeDuration::Hour => Duration::from_hours(1),
+                    task::SnoozeDuration::Day => Duration::from_hours(24),
+                    task::SnoozeDuration::Week => Duration::from_hours(24 * 7),
+                    task::SnoozeDuration::Month => Duration::from_hours(24 * 30),
+                };
+                self.snooze_information.snooze_until =
+                    Some(self.snooze_information.snooze_until.as_ref().unwrap() + &duration);
             }
         }
     }

@@ -13,6 +13,7 @@ pub(crate) struct Data {
 pub(crate) struct Filters {
     pub complete: bool,
     pub todo: bool,
+    pub snoozed: bool,
 }
 
 #[derive(Debug)]
@@ -64,7 +65,8 @@ impl Data {
             .enumerate()
             .filter(|(_, task)| {
                 (task.completed() && self.filters.complete)
-                    || (task.visible_as_pending() && self.filters.todo)
+                    || (task.visible_as_pending() && self.filters.todo && !task.hidden_because_of_snooze())
+                    || (task.hidden_because_of_snooze() && self.filters.snoozed)
             })
             .collect::<Vec<_>>();
         visible_tasks
@@ -106,6 +108,7 @@ mod tests {
             filters: Filters {
                 todo: true,
                 complete: true,
+                snoozed: false,
             },
         };
 

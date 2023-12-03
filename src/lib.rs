@@ -80,6 +80,7 @@ impl Sandbox for Organizer {
                 filters: Filters {
                     todo: true,
                     complete: false,
+                    snoozed: false,
                 },
             },
         };

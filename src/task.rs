@@ -9,6 +9,8 @@ pub(crate) struct Task {
     description: String,
     pub creation_time: Time,
     pub completion_time: Option<Time>,
+    #[serde(default)]
+    pub snooze_information: SnoozeInformation,
 }
 
 #[derive(Debug, Clone)]
@@ -16,6 +18,22 @@ pub enum Message {
     ToggleTaskCompletion(bool),
     TextInput(String),
     DeleteTask,
+    AddSnoozeTime,
+    SetSnoozeDuration(SnoozeDuration),
+}
+
+#[derive(Debug, Clone)]
+pub enum SnoozeDuration {
+    Hour,
+    Day,
+    Week,
+    Month,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Default)]
+pub(crate) struct SnoozeInformation {
+    pub visible: bool,
+    pub snooze_until: Option<Time>,
 }
 
 impl Task {
@@ -26,6 +44,10 @@ impl Task {
             description: "".to_string(),
             creation_time: Time::now(),
             completion_time: None,
+            snooze_information: SnoozeInformation {
+                visible: false,
+                snooze_until: None,
+            },
         }
     }
 
@@ -42,6 +64,13 @@ impl Task {
         } else {
             true
         }
+    }
+
+    pub fn hidden_because_of_snooze(&self) -> bool {
+        self.snooze_information
+            .snooze_until
+            .as_ref()
+            .is_some_and(|snooze_until| snooze_until > &Time::now())
     }
 
     pub fn set_completed(&mut self, completed: bool) {

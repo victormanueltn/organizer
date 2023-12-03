@@ -13,6 +13,7 @@ pub enum Message {
     Save,
     ToggleActiveFilter(bool),
     ToggleCompleteFilter(bool),
+    ToggleSnoozeFilter(bool),
     SwapWithPrevious(usize),
     SwapWithNext(usize),
     SelectView(ViewType),
@@ -35,8 +36,18 @@ impl ListView for Organizer {
             self.data.filters.complete,
             Message::ToggleCompleteFilter,
         );
+        let button_snoozed_tasks = iced::widget::Checkbox::new(
+            "Snoozed",
+            self.data.filters.snoozed,
+            Message::ToggleSnoozeFilter,
+        );
 
-        let a_row = iced::widget::row![button_todo_tasks, button_complete_tasks].spacing(40);
+        let a_row = iced::widget::row![
+            button_todo_tasks,
+            button_complete_tasks,
+            button_snoozed_tasks
+        ]
+        .spacing(40);
 
         let data_view = self.data.view();
         let mut a_column =
@@ -94,7 +105,7 @@ impl ListView for Organizer {
                 if let task::Message::DeleteTask = task_message {
                     self.data.tasks.remove(task_id);
                 } else {
-                self.data.tasks[task_id].update(task_message);
+                    self.data.tasks[task_id].update(task_message);
                 }
             }
             Message::UpdateSaveFileName(file_name) => {
@@ -119,9 +130,16 @@ impl ListView for Organizer {
             }
             Message::ToggleActiveFilter(value) => {
                 self.data.filters.todo = value;
+                self.data.filters.snoozed = false;
             }
             Message::ToggleCompleteFilter(value) => {
                 self.data.filters.complete = value;
+                self.data.filters.snoozed = false;
+            }
+            Message::ToggleSnoozeFilter(value) => {
+                self.data.filters.todo = false;
+                self.data.filters.complete = false;
+                self.data.filters.snoozed = value;
             }
             Message::SwapWithPrevious(index) => {
                 let first_visible = index == 0;
