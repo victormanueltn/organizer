@@ -115,17 +115,25 @@ impl ToIced for Task {
         let delete_button =
             add_button("Delete", task::Message::DeleteTask).style(iced::theme::Button::Destructive);
 
-        let snooze_button = add_button("Snooze", task::Message::AddSnoozeTime)
-            .style(iced::theme::Button::Secondary);
-
-        let a_row = row(vec![])
-            .spacing(10)
-            .padding(10)
-            .align_items(iced::Alignment::Center)
-            .push(a_checkbox)
-            .push(a_text_input)
-            .push(delete_button)
-            .push(snooze_button);
+        let a_row = {
+            let mut a_row = row(vec![])
+                .spacing(10)
+                .padding(10)
+                .align_items(iced::Alignment::Center)
+                .push(a_checkbox)
+                .push(a_text_input)
+                .push(delete_button);
+            if self.hidden_because_of_snooze() {
+                let unsnooze_button = add_button("Unsnooze", task::Message::Unsnooze)
+                    .style(iced::theme::Button::Secondary);
+                a_row = a_row.push(unsnooze_button);
+            } else {
+                let snooze_button = add_button("Snooze", task::Message::AddSnoozeTime)
+                    .style(iced::theme::Button::Secondary);
+                a_row = a_row.push(snooze_button);
+            }
+            a_row
+        };
 
         let mut a_column = column(vec![]).push(a_row);
 
@@ -178,6 +186,10 @@ impl ToIced for Task {
             task::Message::AddSnoozeTime => {
                 self.snooze_information.visible = true;
                 self.snooze_information.snooze_until = Some(Time::now());
+            }
+            task::Message::Unsnooze => {
+                self.snooze_information.visible = false;
+                self.snooze_information.snooze_until = None;
             }
             task::Message::SetSnoozeDuration(duration) => {
                 self.snooze_information.visible = false;

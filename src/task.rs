@@ -20,6 +20,7 @@ pub enum Message {
     DeleteTask,
     AddSnoozeTime,
     SetSnoozeDuration(SnoozeDuration),
+    Unsnooze,
 }
 
 #[derive(Debug, Clone)]
