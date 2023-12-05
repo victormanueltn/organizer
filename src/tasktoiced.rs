@@ -138,6 +138,10 @@ impl ToIced for Task {
         let mut a_column = column(vec![]).push(a_row);
 
         let snooze_duration_row = if self.snooze_information.visible {
+            let quantity = self.snooze_information.quantity.to_string();
+            let quantity_input =
+                iced::widget::text_input(&quantity, &quantity, task::Message::SetSnoozeQuantity)
+                    .padding(10);
             let hour = add_button(
                 "Hour",
                 task::Message::SetSnoozeDuration(task::SnoozeDuration::Hour),
@@ -159,7 +163,14 @@ impl ToIced for Task {
             )
             .style(iced::theme::Button::Secondary);
 
-            Some(row(vec![]).push(hour).push(day).push(week).push(month))
+            Some(
+                row(vec![])
+                    .push(quantity_input)
+                    .push(hour)
+                    .push(day)
+                    .push(week)
+                    .push(month),
+            )
         } else {
             None
         };
@@ -187,17 +198,30 @@ impl ToIced for Task {
                 self.snooze_information.visible = true;
                 self.snooze_information.snooze_until = Some(Time::now());
             }
+            task::Message::SetSnoozeQuantity(value) => {
+                let value = {
+                    let mut result: u32 = 1;
+                    if value.is_empty() {
+                        result = 1;
+                    } else if let Ok(value) = value.parse::<u32>() {
+                        result = value
+                    }
+                    result
+                };
+                self.snooze_information.quantity = value;
+            }
             task::Message::Unsnooze => {
                 self.snooze_information.visible = false;
                 self.snooze_information.snooze_until = None;
             }
             task::Message::SetSnoozeDuration(duration) => {
                 self.snooze_information.visible = false;
+                let quantity = self.snooze_information.quantity;
                 let duration: Duration = match duration {
-                    task::SnoozeDuration::Hour => Duration::from_hours(1),
-                    task::SnoozeDuration::Day => Duration::from_hours(24),
-                    task::SnoozeDuration::Week => Duration::from_hours(24 * 7),
-                    task::SnoozeDuration::Month => Duration::from_hours(24 * 30),
+                    task::SnoozeDuration::Hour => Duration::from_hours(quantity as i64 * 1),
+                    task::SnoozeDuration::Day => Duration::from_hours(quantity as i64 * 24),
+                    task::SnoozeDuration::Week => Duration::from_hours(quantity as i64 * 24 * 7),
+                    task::SnoozeDuration::Month => Duration::from_hours(quantity as i64 * 24 * 30),
                 };
                 self.snooze_information.snooze_until =
                     Some(self.snooze_information.snooze_until.as_ref().unwrap() + &duration);

@@ -20,6 +20,7 @@ pub enum Message {
     DeleteTask,
     AddSnoozeTime,
     SetSnoozeDuration(SnoozeDuration),
+    SetSnoozeQuantity(String),
     Unsnooze,
 }
 
@@ -34,6 +35,7 @@ pub enum SnoozeDuration {
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Default)]
 pub(crate) struct SnoozeInformation {
     pub visible: bool,
+    pub quantity: u32,
     pub snooze_until: Option<Time>,
 }
 
@@ -46,6 +48,7 @@ impl Task {
             creation_time: Time::now(),
             completion_time: None,
             snooze_information: SnoozeInformation {
+                quantity: 1,
                 visible: false,
                 snooze_until: None,
             },
